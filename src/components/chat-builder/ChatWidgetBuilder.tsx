@@ -6,6 +6,7 @@ import { Step2ThemeAppearance } from './steps/Step2ThemeAppearance';
 import { Step3UserInformation } from './steps/Step3UserInformation';
 import { Step4AgentConfiguration } from './steps/Step4AgentConfiguration';
 import { Step5BusinessHours } from './steps/Step5BusinessHours';
+import { CompletionStep } from './steps/CompletionStep';
 import { ChatConfig, defaultConfig } from '../../types/chat-config';
 import { useToast } from '../../hooks/use-toast';
 
@@ -20,7 +21,7 @@ export const ChatWidgetBuilder = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 6) {
       // Mark current step as completed
       setSteps(prev => prev.map(step => 
         step.id === currentStep 
@@ -40,15 +41,7 @@ export const ChatWidgetBuilder = () => {
   const handleFinish = () => {
     // Mark all steps as completed
     setSteps(prev => prev.map(step => ({ ...step, completed: true })));
-    
-    // Show success message
-    toast({
-      title: "Configuration Complete!",
-      description: "Your chat widget has been successfully configured.",
-    });
-
-    // Here you would typically save the configuration to your backend
-    console.log('Final Configuration:', config);
+    setCurrentStep(6); // Go to completion screen
   };
 
   // Get the preview title and subtitle based on current step
@@ -133,6 +126,16 @@ export const ChatWidgetBuilder = () => {
             onPrevious={handlePrevious}
           />
         );
+      case 6:
+        return (
+          <CompletionStep
+            config={config}
+            onRestart={() => {
+              setCurrentStep(1);
+              setSteps(getSteps());
+            }}
+          />
+        );
       default:
         return null;
     }
@@ -149,20 +152,22 @@ export const ChatWidgetBuilder = () => {
         {/* Main Content */}
         <div className="cwb-builder-content grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Configuration Panel */}
-          <div className="cwb-config-panel lg:col-span-2">
+          <div className={`cwb-config-panel ${currentStep === 6 ? 'lg:col-span-3' : 'lg:col-span-2'}`}>
             {renderCurrentStep()}
           </div>
 
-          {/* Preview Panel */}
-          <div className="cwb-preview-panel lg:col-span-1">
-            <div className="cwb-preview-sticky sticky top-6">
-              <ChatPreview 
-                config={config} 
-                title={previewInfo.title}
-                subtitle={previewInfo.subtitle}
-              />
+          {/* Preview Panel - Hide on completion step */}
+          {currentStep !== 6 && (
+            <div className="cwb-preview-panel lg:col-span-1">
+              <div className="cwb-preview-sticky sticky top-6">
+                <ChatPreview 
+                  config={config} 
+                  title={previewInfo.title}
+                  subtitle={previewInfo.subtitle}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
