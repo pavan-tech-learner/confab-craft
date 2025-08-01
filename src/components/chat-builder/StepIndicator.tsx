@@ -15,54 +15,45 @@ interface StepIndicatorProps {
 
 export const StepIndicator = ({ currentStep, steps }: StepIndicatorProps) => {
   return (
-    <div className="cwb-step-indicator flex items-center justify-between w-full max-w-4xl mx-auto mb-8 px-4">
-      {steps.map((step, index) => (
-        <div key={step.id} className="cwb-step-item flex items-center">
-          {/* Step Circle */}
-          <div className="cwb-step-circle-container flex flex-col items-center">
-            <div
-              className={`cwb-step-circle w-12 h-12 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
-                step.completed
-                  ? 'bg-cwb-success text-cwb-success-foreground'
-                  : currentStep === step.id
-                  ? 'bg-cwb-primary text-cwb-primary-foreground'
-                  : 'bg-cwb-step-background text-cwb-step-pending'
-              }`}
-            >
-              {step.completed ? (
-                <Check className="w-5 h-5" />
+    <div className="cwb-step-indicator flex items-center justify-center mb-8">
+      <div className="flex items-center space-x-1 lg:space-x-3">
+        {steps.map((step, index) => (
+          <div key={step.id} className="flex items-center">
+            <div className={`
+              flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10 rounded-full border-2 transition-all duration-300
+              ${step.completed || currentStep > step.id
+                ? 'bg-cwb-primary border-cwb-primary text-cwb-primary-foreground'
+                : currentStep === step.id
+                ? 'bg-cwb-primary border-cwb-primary text-cwb-primary-foreground ring-2 ring-cwb-primary/20'
+                : 'border-cwb-border text-cwb-muted-foreground'
+              }
+            `}>
+              {step.completed || currentStep > step.id ? (
+                <Check className="w-4 h-4 lg:w-5 lg:h-5" />
               ) : (
                 <span className="cwb-step-icon">{step.icon}</span>
               )}
             </div>
-            
-            {/* Step Labels */}
-            <div className="cwb-step-labels mt-3 text-center">
-              <div className="cwb-step-title text-sm font-medium text-cwb-foreground">
+            <div className="ml-1 lg:ml-2 hidden sm:block">
+              <div className={`text-xs font-medium ${
+                step.completed || currentStep >= step.id ? 'text-cwb-primary' : 'text-cwb-muted-foreground'
+              }`}>
                 Step {step.id}
               </div>
-              <div className="cwb-step-subtitle text-xs text-cwb-muted-foreground max-w-[120px]">
+              <div className={`text-xs ${
+                step.completed || currentStep >= step.id ? 'text-cwb-foreground' : 'text-cwb-muted-foreground'
+              }`}>
                 {step.subtitle}
               </div>
             </div>
+            {index < steps.length - 1 && (
+              <div className={`w-3 lg:w-6 h-0.5 mx-1 lg:mx-3 transition-all duration-300 ${
+                step.completed || currentStep > step.id ? 'bg-cwb-primary' : 'bg-cwb-border'
+              }`} />
+            )}
           </div>
-          
-          {/* Connector Line */}
-          {index < steps.length - 1 && (
-            <div className="cwb-step-connector flex-1 mx-4">
-              <div
-                className={`cwb-connector-line h-0.5 transition-all duration-200 ${
-                  step.completed
-                    ? 'bg-cwb-success'
-                    : currentStep > step.id
-                    ? 'bg-cwb-primary'
-                    : 'bg-cwb-step-background'
-                }`}
-              />
-            </div>
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

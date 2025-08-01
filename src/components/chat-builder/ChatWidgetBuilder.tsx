@@ -142,20 +142,20 @@ export const ChatWidgetBuilder = () => {
 
   return (
     <div className="cwb-widget-builder min-h-screen bg-cwb-background">
-      <div className="cwb-builder-container max-w-7xl mx-auto px-4 py-8">
+      <div className="cwb-builder-container max-w-6xl mx-auto px-4 py-6">
         {/* Step Indicator */}
         <StepIndicator currentStep={currentStep} steps={steps} />
 
         {/* Main Content */}
-        <div className="cwb-builder-content grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="cwb-builder-content grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Configuration Panel */}
-          <div className="cwb-config-panel lg:col-span-3">
+          <div className="cwb-config-panel lg:col-span-2">
             {renderCurrentStep()}
           </div>
 
           {/* Preview Panel */}
-          <div className="cwb-preview-panel lg:col-span-2">
-            <div className="cwb-preview-sticky sticky top-8">
+          <div className="cwb-preview-panel lg:col-span-1">
+            <div className="cwb-preview-sticky sticky top-6">
               <ChatPreview 
                 config={config} 
                 title={previewInfo.title}

@@ -48,7 +48,16 @@ export const ChatPreview = ({
       </div>
 
       {/* Preview Area */}
-      <div className="cwb-preview-area relative bg-gray-100 rounded-lg p-6 h-96 overflow-hidden">
+      <div className="cwb-preview-area relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 h-[500px] overflow-hidden border">
+        {/* Simulated Website Background */}
+        <div className="w-full h-full bg-white rounded border shadow-sm p-4">
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+            <div className="h-3 bg-gray-100 rounded w-2/3"></div>
+          </div>
+        </div>
+        
         {/* Chat Widget */}
         <div className="cwb-chat-widget absolute bottom-4 right-4">
           {isOpen ? (

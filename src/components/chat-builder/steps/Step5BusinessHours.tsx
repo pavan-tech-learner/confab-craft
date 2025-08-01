@@ -1,9 +1,10 @@
-import { Clock, MessageSquare } from 'lucide-react';
+import { Clock, MessageSquare, Timer, WifiOff, MessageSquareX } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
 import { Switch } from '../../ui/switch';
+import { Slider } from '../../ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { ChatConfig } from '../../../types/chat-config';
 
@@ -218,22 +219,16 @@ export const Step5BusinessHours = ({
         </div>
 
         {/* Disconnect Settings */}
-        <div className="cwb-form-section">
-          <div className="cwb-section-header mb-4">
-            <h3 className="cwb-section-title text-lg font-medium text-cwb-foreground flex items-center">
-              <MessageSquare className="w-5 h-5 text-cwb-primary mr-2" />
-              Auto-Disconnect Settings
-            </h3>
+        <div className="cwb-form-section space-y-6">
+          <div className="flex items-center gap-2">
+            <WifiOff className="w-5 h-5 text-cwb-primary" />
+            <Label className="text-lg font-semibold text-cwb-foreground">Auto Disconnect</Label>
           </div>
 
-          <div className="cwb-switch-field flex items-center justify-between p-4 bg-cwb-muted/30 rounded-lg mb-4">
-            <div className="cwb-switch-label">
-              <Label className="text-sm font-medium text-cwb-foreground">
-                Enable Auto-Disconnect
-              </Label>
-              <p className="text-xs text-cwb-muted-foreground mt-1">
-                Automatically disconnect inactive users
-              </p>
+          <div className="flex items-center justify-between p-4 border border-cwb-border rounded-lg">
+            <div>
+              <Label className="text-sm font-medium text-cwb-foreground">Enable Auto Disconnect</Label>
+              <p className="text-xs text-cwb-muted-foreground">Disconnect users after inactivity period</p>
             </div>
             <Switch
               checked={config.disconnectSettings.enabled}
@@ -242,42 +237,54 @@ export const Step5BusinessHours = ({
           </div>
 
           {config.disconnectSettings.enabled && (
-            <div className="cwb-disconnect-config space-y-4">
-              <div className="cwb-form-field">
-                <Label className="cwb-field-label text-sm font-medium text-cwb-foreground">
-                  Inactivity Timeout (minutes)
-                </Label>
-                <Input
-                  type="number"
-                  min="1"
-                  max="60"
-                  value={config.disconnectSettings.inactivityTimeoutMinutes}
-                  onChange={(e) => handleDisconnectChange('inactivityTimeoutMinutes', parseInt(e.target.value))}
-                  className="cwb-form-input mt-1 border-cwb-input-border focus:border-cwb-primary focus:ring-cwb-primary"
+            <div className="space-y-4">
+              {/* Timeout Settings */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium flex items-center gap-2 text-cwb-foreground">
+                    <Timer className="w-4 h-4 text-cwb-primary" />
+                    Inactivity Timeout
+                  </Label>
+                  <span className="text-sm font-semibold text-cwb-primary">
+                    {config.disconnectSettings.inactivityTimeoutMinutes} minutes
+                  </span>
+                </div>
+                
+                <Slider
+                  value={[config.disconnectSettings.inactivityTimeoutMinutes]}
+                  onValueChange={(value) => handleDisconnectChange('inactivityTimeoutMinutes', value[0])}
+                  max={60}
+                  min={1}
+                  step={1}
+                  className="w-full"
                 />
+                
+                <div className="flex justify-between text-xs text-cwb-muted-foreground">
+                  <span>1 min</span>
+                  <span>30 min</span>
+                  <span>60 min</span>
+                </div>
               </div>
 
-              <div className="cwb-form-field">
-                <Label className="cwb-field-label text-sm font-medium text-cwb-foreground">
+              {/* Disconnect Message */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2 text-cwb-foreground">
+                  <MessageSquareX className="w-4 h-4 text-cwb-primary" />
                   Disconnect Message
                 </Label>
                 <Textarea
                   value={config.disconnectSettings.disconnectMessage}
                   onChange={(e) => handleDisconnectChange('disconnectMessage', e.target.value)}
-                  className="cwb-form-textarea mt-1 border-cwb-input-border focus:border-cwb-primary focus:ring-cwb-primary"
                   placeholder="You've been disconnected due to inactivity..."
-                  rows={3}
+                  className="min-h-[60px] text-sm border-cwb-input-border focus:border-cwb-primary focus:ring-cwb-primary"
                 />
               </div>
 
-              <div className="cwb-switch-field flex items-center justify-between">
-                <div className="cwb-switch-label">
-                  <Label className="text-sm font-medium text-cwb-foreground">
-                    Show Reconnect Button
-                  </Label>
-                  <p className="text-xs text-cwb-muted-foreground">
-                    Allow users to easily reconnect after disconnect
-                  </p>
+              {/* Reconnect Button */}
+              <div className="flex items-center justify-between p-4 border border-cwb-border rounded-lg">
+                <div>
+                  <Label className="text-sm font-medium text-cwb-foreground">Show Reconnect Button</Label>
+                  <p className="text-xs text-cwb-muted-foreground">Allow quick reconnection</p>
                 </div>
                 <Switch
                   checked={config.disconnectSettings.showReconnectButton}
