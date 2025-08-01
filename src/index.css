@@ -2,40 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Chat Widget Builder Design System - Unique prefixed styles */
 
 @layer base {
   :root {
+    /* Chat Widget Builder Theme */
+    --cwb-background: 240 10% 98%;
+    --cwb-foreground: 240 10% 15%;
+    --cwb-card: 0 0% 100%;
+    --cwb-card-foreground: 240 10% 15%;
+    
+    /* Primary brand colors - Purple/Blue gradient theme */
+    --cwb-primary: 248 95% 62%;
+    --cwb-primary-foreground: 0 0% 100%;
+    --cwb-primary-dark: 248 95% 55%;
+    --cwb-primary-light: 248 95% 70%;
+    
+    /* Secondary colors */
+    --cwb-secondary: 240 5% 96%;
+    --cwb-secondary-foreground: 240 6% 25%;
+    
+    /* Muted colors */
+    --cwb-muted: 240 5% 96%;
+    --cwb-muted-foreground: 240 4% 46%;
+    
+    /* Border and inputs */
+    --cwb-border: 240 6% 90%;
+    --cwb-input: 240 6% 90%;
+    --cwb-input-border: 240 6% 85%;
+    --cwb-ring: 248 95% 62%;
+    
+    /* Success and error states */
+    --cwb-success: 142 76% 36%;
+    --cwb-success-foreground: 0 0% 100%;
+    --cwb-destructive: 0 84% 60%;
+    --cwb-destructive-foreground: 0 0% 100%;
+    
+    /* Chat widget specific colors */
+    --cwb-chat-primary: 248 95% 62%;
+    --cwb-chat-background: 0 0% 100%;
+    --cwb-chat-message-bg: 240 5% 96%;
+    --cwb-chat-user-message: 248 95% 62%;
+    --cwb-chat-shadow: 240 6% 90%;
+    
+    /* Step indicator */
+    --cwb-step-active: 248 95% 62%;
+    --cwb-step-completed: 142 76% 36%;
+    --cwb-step-pending: 240 5% 64%;
+    --cwb-step-background: 240 5% 96%;
+    
+    /* Spacing and typography */
+    --cwb-radius: 0.5rem;
+    --cwb-radius-lg: 0.75rem;
+    --cwb-spacing-xs: 0.25rem;
+    --cwb-spacing-sm: 0.5rem;
+    --cwb-spacing-md: 1rem;
+    --cwb-spacing-lg: 1.5rem;
+    --cwb-spacing-xl: 2rem;
+
+    /* Legacy variables for compatibility */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
