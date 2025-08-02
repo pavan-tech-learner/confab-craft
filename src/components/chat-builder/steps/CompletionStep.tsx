@@ -13,10 +13,8 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
   const { toast } = useToast();
 
   const handleViewWidget = () => {
-    // Create URL with config data
-    const configParam = encodeURIComponent(JSON.stringify(config));
-    const url = `/widget-preview?config=${configParam}`;
-    window.open(url, '_blank');
+    // Just open the preview route; config will be loaded from localStorage
+    window.open('/widget-preview', '_blank');
   };
 
   const handleDownloadConfig = () => {

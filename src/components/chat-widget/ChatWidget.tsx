@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageCircle, X, Minimize2, Send, User } from 'lucide-react';
+import { MessageCircle, X, Minimize2, Send, User, MessageSquare, Phone, Headphones, HelpCircle, Mail } from 'lucide-react';
 import { ChatConfig } from '../../types/chat-config';
 
 interface ChatWidgetProps {
@@ -68,7 +68,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
     <div className={`cwb-chat-widget fixed ${getPositionClasses()} z-50 ${className}`}>
       {isOpen ? (
         <div 
-          className="cwb-chat-window bg-white rounded-2xl shadow-2xl w-80 h-96 flex flex-col overflow-hidden"
+          className="cwb-chat-window bg-white rounded-2xl shadow-2xl w-96 h-[500px] flex flex-col overflow-hidden"
           style={{ 
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' 
           }}
@@ -78,6 +78,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
             className="cwb-chat-header px-4 py-3 text-white flex items-center justify-between"
             style={{ backgroundColor: config.themeColor }}
           >
+
             <div className="cwb-header-content flex items-center space-x-3">
               {config.showAgentIcon && (
                 <div className="cwb-agent-avatar w-8 h-8 bg-black/20 rounded-full flex items-center justify-center">
@@ -104,17 +105,15 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                 )}
               </div>
             </div>
-            <div className="cwb-header-actions flex items-center space-x-2">
-              <button className="cwb-minimize-btn text-white/80 hover:text-white transition-colors">
-                <Minimize2 className="w-4 h-4" />
-              </button>
-              <button 
-                className="cwb-close-btn text-white/80 hover:text-white transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            <div className="cwb-header-actions flex items-center">
+  <button 
+    className="cwb-close-btn text-white/80 hover:text-white transition-colors"
+    onClick={() => setIsOpen(false)}
+    aria-label="Close"
+  >
+    <X className="w-4 h-4" />
+  </button>
+</div>
           </div>
 
           {/* Messages Area */}
@@ -252,13 +251,93 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
           )}
         </div>
       ) : (
-        <button 
-          className="cwb-chat-bubble w-14 h-14 rounded-full text-white shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
-          style={{ backgroundColor: config.themeColor }}
-          onClick={() => setIsOpen(true)}
-        >
-          <MessageCircle className="w-6 h-6" />
-        </button>
+        <>
+          {/* Chat Prompt Bubble or Inline Prompt */}
+          {config.showChatPrompt && (
+            config.promptStyle === 'inline' ? (
+              <div className="cwb-chat-prompt-inline flex items-center gap-2 mb-2 animate-fade-in" style={{ position: 'absolute', bottom: '4.5rem', right: 0, zIndex: 60 }}>
+                <input
+                  type="text"
+                  className="cwb-prompt-input border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
+                  placeholder={config.chatPromptMessage || 'Hi there, have a question? Text us here.'}
+                  style={{ minWidth: 180, maxWidth: 260 }}
+                  onKeyPress={e => {
+                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                      handleSendMessage(e.currentTarget.value);
+                      e.currentTarget.value = '';
+                    }
+                  }}
+                />
+                <button
+                  className="cwb-send-btn w-8 h-8 rounded-full text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: config.themeColor }}
+                  onClick={e => {
+                    const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                    if (input && input.value.trim()) {
+                      handleSendMessage(input.value);
+                      input.value = '';
+                    }
+                  }}
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div
+                className="cwb-chat-prompt-bubble flex items-center gap-3 mb-2 animate-fade-in" style={{ position: 'absolute', bottom: '4.5rem', right: 0, zIndex: 60, alignItems: 'center' }}
+              >
+                {config.companyLogo && (
+                  <img src={config.companyLogo} alt="Avatar" className="w-8 h-8 rounded-full object-cover shadow mr-2" />
+                )}
+                <div className="relative bg-white px-4 py-2 rounded-xl shadow-md text-gray-800 flex items-center min-w-[200px]">
+                  <span className="block text-sm whitespace-pre-line mr-6">{config.chatPromptMessage || 'Hi there, have a question? Text us here.'}</span>
+                  <button
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-xs"
+                    style={{ lineHeight: '1' }}
+                    onClick={e => { e.stopPropagation(); if (typeof window !== 'undefined') { (e.target as HTMLElement).parentElement?.parentElement?.remove(); } }}
+                    aria-label="Close prompt"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  {/* SVG pointer at right end only for bubble-above */}
+                  {config.promptStyle !== 'inline' && (
+                    <svg
+                      className="absolute -bottom-3 right-3"
+                      width="18"
+                      height="12"
+                      viewBox="0 0 18 12"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ zIndex: 1 }}
+                    >
+                      <polygon points="0,0 18,0 9,12" fill="#fff" filter="drop-shadow(0px 2px 4px rgba(0,0,0,0.08))" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+            )
+          )}
+          <button 
+            className="cwb-chat-bubble w-14 h-14 rounded-full text-white shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
+            style={{ backgroundColor: config.themeColor }}
+            onClick={() => setIsOpen(true)}
+          >
+            {/* Dynamic chat icon for minimized state, including custom */}
+            {(() => {
+              if (config.chatIcon === 'custom' && config.customChatIconUrl) {
+                return <img src={config.customChatIconUrl} alt="Chat Icon" className="w-6 h-6 rounded-full object-cover" />;
+              }
+              switch (config.chatIcon) {
+                case 'message-square': return <MessageSquare className="w-6 h-6" />;
+                case 'phone': return <Phone className="w-6 h-6" />;
+                case 'headphones': return <Headphones className="w-6 h-6" />;
+                case 'help-circle': return <HelpCircle className="w-6 h-6" />;
+                case 'mail': return <Mail className="w-6 h-6" />;
+                default: return <MessageCircle className="w-6 h-6" />;
+              }
+            })()}
+          </button>
+        </>
       )}
     </div>
   );

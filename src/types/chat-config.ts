@@ -11,6 +11,16 @@ export interface ChatConfig {
   agentName: string;
   companyLogo?: string;
 
+  // Chat widget icon and prompt
+  chatIcon: 'message-circle' | 'message-square' | 'phone' | 'headphones' | 'help-circle' | 'mail' | 'custom';
+  customChatIconUrl?: string;
+  showChatPrompt: boolean;
+  chatPromptMessage: string;
+  /**
+   * Style for the chat prompt bubble (e.g. 'bubble-above', 'inline').
+   */
+  promptStyle?: 'bubble-above' | 'inline';
+
   // User information collection
   requireUserInfo: boolean;
   requiredFields: {
@@ -68,6 +78,11 @@ export const defaultConfig: ChatConfig = {
   showAgentIcon: true,
   companyName: 'Your Company',
   agentName: 'Support Agent',
+
+  // Chat widget icon and prompt defaults
+  chatIcon: 'message-circle',
+  showChatPrompt: true,
+  chatPromptMessage: 'Hi there, have a question? Text us here.',
 
   requireUserInfo: false,
   requiredFields: {

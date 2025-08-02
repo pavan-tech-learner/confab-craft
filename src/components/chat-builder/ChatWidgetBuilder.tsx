@@ -17,7 +17,15 @@ export const ChatWidgetBuilder = () => {
   const { toast } = useToast();
 
   const handleConfigChange = (updates: Partial<ChatConfig>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
+    setConfig(prev => {
+      const updated = { ...prev, ...updates };
+      try {
+        localStorage.setItem('chatWidgetConfig', JSON.stringify(updated));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+      return updated;
+    });
   };
 
   const handleNext = () => {
@@ -150,18 +158,18 @@ export const ChatWidgetBuilder = () => {
         <StepIndicator currentStep={currentStep} steps={steps} />
 
         {/* Main Content */}
-        <div className="cwb-builder-content grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Configuration Panel */}
-          <div className={`cwb-config-panel ${currentStep === 6 ? 'lg:col-span-3' : 'lg:col-span-2'}`}>
+        <div className="cwb-builder-content grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Configuration Panel - 60% width */}
+          <div className={`cwb-config-panel ${currentStep === 6 ? 'lg:col-span-5' : 'lg:col-span-3'}`}>
             {renderCurrentStep()}
           </div>
 
-          {/* Preview Panel - Hide on completion step */}
+          {/* Preview Panel - 40% width */}
           {currentStep !== 6 && (
-            <div className="cwb-preview-panel lg:col-span-1">
+            <div className="cwb-preview-panel lg:col-span-2">
               <div className="cwb-preview-sticky sticky top-6">
-                <ChatPreview 
-                  config={config} 
+                <ChatPreview
+                  config={config}
                   title={previewInfo.title}
                   subtitle={previewInfo.subtitle}
                 />

@@ -1,4 +1,3 @@
-import { useSearchParams } from 'react-router-dom';
 import { ChatWidget } from '../components/chat-widget/ChatWidget';
 import { ChatConfig, defaultConfig } from '../types/chat-config';
 import { ArrowLeft, Code, Download } from 'lucide-react';
@@ -6,23 +5,22 @@ import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
 
 export default function WidgetPreview() {
-  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
-  // Get config from URL params or use default
-  const getConfigFromParams = (): ChatConfig => {
-    const configParam = searchParams.get('config');
-    if (configParam) {
-      try {
-        return { ...defaultConfig, ...JSON.parse(decodeURIComponent(configParam)) };
-      } catch (error) {
-        console.error('Error parsing config from URL:', error);
+  // Get config from localStorage or use default
+  const getConfigFromLocalStorage = (): ChatConfig => {
+    try {
+      const configStr = localStorage.getItem('chatWidgetConfig');
+      if (configStr) {
+        return { ...defaultConfig, ...JSON.parse(configStr) };
       }
+    } catch (error) {
+      console.error('Error parsing config from localStorage:', error);
     }
     return defaultConfig;
   };
 
-  const config = getConfigFromParams();
+  const config = getConfigFromLocalStorage();
 
   const handleGetCode = () => {
     const embedCode = `<!-- Chat Widget Embed Code -->

@@ -1,4 +1,4 @@
-import { Palette, MessageCircle } from 'lucide-react';
+import { Palette, MessageCircle, MessageSquare, Phone, Headphones, HelpCircle, Mail } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
@@ -99,6 +99,150 @@ export const Step2ThemeAppearance = ({
           </div>
         </div>
 
+        {/* Chat Icon Section */}
+        <div className="cwb-form-section">
+          <div className="cwb-section-header mb-4">
+            <h3 className="cwb-section-title text-lg font-medium text-cwb-foreground">
+              Chat Icon
+            </h3>
+            <p className="text-sm text-cwb-muted-foreground">
+              Choose the icon for your chat widget button
+            </p>
+          </div>
+
+          <div className="cwb-icon-selection flex flex-row gap-4 items-center py-2 mb-6">
+            {[
+              { value: 'message-circle', icon: MessageCircle, label: 'Message Circle' },
+              { value: 'message-square', icon: MessageSquare, label: 'Message Square' },
+              { value: 'phone', icon: Phone, label: 'Phone' },
+              { value: 'headphones', icon: Headphones, label: 'Headphones' },
+              { value: 'help-circle', icon: HelpCircle, label: 'Help Circle' },
+              { value: 'mail', icon: Mail, label: 'Mail' }
+            ].map((option) => {
+              const IconComponent = option.icon;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onConfigChange({ chatIcon: option.value as any })}
+                  className={`cwb-icon-option flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all focus:outline-none ${
+                    config.chatIcon === option.value
+                      ? 'border-cwb-primary text-cwb-primary bg-white ring-2 ring-cwb-primary'
+                      : 'border-cwb-border text-cwb-foreground bg-transparent'
+                  }`}
+                  title={option.label}
+                >
+                  <IconComponent className="w-6 h-6" />
+                </button>
+              );
+            })}
+            {/* Custom Icon Option */}
+            <label className={`cwb-icon-option flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all focus:outline-none cursor-pointer ${
+              config.chatIcon === 'custom'
+                ? 'border-cwb-primary text-cwb-primary bg-white ring-2 ring-cwb-primary'
+                : 'border-cwb-border text-cwb-foreground bg-transparent'
+            }`} title="Custom">
+              {config.customChatIconUrl ? (
+                <img src={config.customChatIconUrl} alt="Custom Icon" className="w-7 h-7 rounded-full object-cover border border-cwb-border" />
+              ) : (
+                <span className="w-6 h-6 flex items-center justify-center text-lg">+</span>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      onConfigChange({ customChatIconUrl: ev.target?.result as string, chatIcon: 'custom' });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* Chat Prompt Section */}
+        <div className="cwb-form-section">
+          <details className="cwb-collapsible px-0 py-0 mb-6" open>
+            <summary className="flex items-center justify-between cursor-pointer select-none text-base font-semibold text-cwb-foreground">
+              <span>Chat Prompt</span>
+              <span className="text-xs text-cwb-muted-foreground ml-2">Configure the message bubble above the chat icon</span>
+            </summary>
+            <div className="mt-4 space-y-4">
+              {/* Visual style selector */}
+              <div>
+                <Label className="text-xs font-medium text-cwb-muted-foreground mb-2 block">Prompt Style</Label>
+                <div className="flex flex-row gap-3">
+                  {[
+                    { value: 'bubble-above', label: 'Bubble Above', preview: (
+                      <div className="w-20 flex flex-col items-center">
+                        <div className="rounded-2xl bg-white border shadow px-3 py-1 text-xs text-cwb-foreground mb-1 max-w-[80px] text-center">Hi there!</div>
+                        <svg width="18" height="12" viewBox="0 0 18 12" fill="none" className="-mt-1">
+                          <polygon points="0,0 18,0 9,12" fill="#fff" stroke="#e5e7eb" />
+                        </svg>
+                      </div>
+                    ) },
+                    { value: 'inline', label: 'Inline', preview: (
+                      <div className="w-20 flex flex-row items-end gap-1">
+                        <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+                          <circle cx="9" cy="6" r="6" fill="#fff" stroke="#e5e7eb" />
+                        </svg>
+                        <div className="rounded-2xl bg-white border shadow px-3 py-1 text-xs text-cwb-foreground max-w-[80px] text-center">Hi there!</div>
+                      </div>
+                    ) }
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={`flex flex-col items-center px-2 py-1 rounded-lg border transition-all shadow-sm ${
+                        (config.promptStyle || 'bubble-above') === option.value
+                          ? 'border-cwb-primary ring-2 ring-cwb-primary bg-white'
+                          : 'border-cwb-border bg-transparent'
+                      }`}
+                      onClick={() => onConfigChange({ promptStyle: option.value as any })}
+                      title={option.label}
+                    >
+                      {option.preview}
+                      <span className="text-xs mt-1">{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Prompt toggle and message */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-sm font-medium text-cwb-foreground">Show Chat Prompt</Label>
+                  <p className="text-xs text-cwb-muted-foreground">Display a message bubble above the chat icon</p>
+                </div>
+                <Switch
+                  checked={config.showChatPrompt}
+                  onCheckedChange={(checked) => onConfigChange({ showChatPrompt: checked })}
+                />
+              </div>
+              {config.showChatPrompt && (
+                <div className="cwb-form-field">
+                  <Label htmlFor="chatPromptMessage" className="cwb-field-label text-sm font-medium text-cwb-foreground">
+                    Prompt Message
+                  </Label>
+                  <Input
+                    id="chatPromptMessage"
+                    value={config.chatPromptMessage}
+                    onChange={(e) => onConfigChange({ chatPromptMessage: e.target.value })}
+                    className="cwb-form-input mt-1 border-cwb-input-border focus:border-cwb-primary focus:ring-cwb-primary"
+                    placeholder="Hi there, have a question? Text us here."
+                  />
+                </div>
+              )}
+            </div>
+          </details>
+        </div>
+
         {/* Messages Section */}
         <div className="cwb-form-section">
           <div className="cwb-section-header mb-4">
@@ -122,35 +266,7 @@ export const Step2ThemeAppearance = ({
               />
             </div>
 
-            <div className="cwb-form-field">
-              <Label className="cwb-field-label text-sm font-medium text-cwb-foreground flex items-center gap-2">
-                <MessageCircle className="w-4 h-4 text-cwb-primary" />
-                Chat Icon Type
-              </Label>
-              
-              <div className="cwb-icon-selection mt-3 grid grid-cols-2 gap-3">
-                {[
-                  { value: '💬', label: 'Message' },
-                  { value: '📞', label: 'Call' },
-                  { value: '👋', label: 'Agent' },
-                  { value: '💡', label: 'Support' }
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => onConfigChange({ welcomeMessageIcon: option.value })}
-                    className={`cwb-icon-option p-3 flex items-center gap-3 rounded-lg border transition-all hover:shadow-sm ${
-                      config.welcomeMessageIcon === option.value
-                        ? 'border-cwb-primary bg-cwb-primary/5 text-cwb-primary'
-                        : 'border-cwb-border hover:border-cwb-primary/30'
-                    }`}
-                  >
-                    <span className="text-lg">{option.value}</span>
-                    <span className="font-medium text-cwb-foreground">{option.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             <div className="cwb-form-field">
               <Label htmlFor="fallbackMessage" className="cwb-field-label text-sm font-medium text-cwb-foreground">
