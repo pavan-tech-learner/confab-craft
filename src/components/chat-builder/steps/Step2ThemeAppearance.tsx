@@ -1,4 +1,4 @@
-import { Palette, Eye, EyeOff } from 'lucide-react';
+import { Palette, MessageCircle } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
@@ -123,33 +123,32 @@ export const Step2ThemeAppearance = ({
             </div>
 
             <div className="cwb-form-field">
-              <Label htmlFor="welcomeMessageIcon" className="cwb-field-label text-sm font-medium text-cwb-foreground">
-                Welcome Message Icon
+              <Label className="cwb-field-label text-sm font-medium text-cwb-foreground flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-cwb-primary" />
+                Chat Icon Type
               </Label>
-              <div className="cwb-icon-selection mt-1">
-                <div className="cwb-icon-presets grid grid-cols-8 gap-2 mb-3">
-                  {['👋', '😊', '💬', '🎉', '🚀', '❤️', '🌟', '✨'].map((icon) => (
-                    <button
-                      key={icon}
-                      type="button"
-                      className={`cwb-icon-preset w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg transition-all hover:scale-105 ${
-                        config.welcomeMessageIcon === icon 
-                          ? 'border-cwb-primary bg-cwb-primary/10' 
-                          : 'border-cwb-border bg-white hover:border-cwb-primary/50'
-                      }`}
-                      onClick={() => onConfigChange({ welcomeMessageIcon: icon })}
-                    >
-                      {icon}
-                    </button>
-                  ))}
-                </div>
-                <Input
-                  id="welcomeMessageIcon"
-                  value={config.welcomeMessageIcon || ''}
-                  onChange={(e) => onConfigChange({ welcomeMessageIcon: e.target.value })}
-                  className="cwb-form-input border-cwb-input-border focus:border-cwb-primary focus:ring-cwb-primary"
-                  placeholder="Or enter custom emoji/icon"
-                />
+              
+              <div className="cwb-icon-selection mt-3 grid grid-cols-2 gap-3">
+                {[
+                  { value: '💬', label: 'Message' },
+                  { value: '📞', label: 'Call' },
+                  { value: '👋', label: 'Agent' },
+                  { value: '💡', label: 'Support' }
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => onConfigChange({ welcomeMessageIcon: option.value })}
+                    className={`cwb-icon-option p-3 flex items-center gap-3 rounded-lg border transition-all hover:shadow-sm ${
+                      config.welcomeMessageIcon === option.value
+                        ? 'border-cwb-primary bg-cwb-primary/5 text-cwb-primary'
+                        : 'border-cwb-border hover:border-cwb-primary/30'
+                    }`}
+                  >
+                    <span className="text-lg">{option.value}</span>
+                    <span className="font-medium text-cwb-foreground">{option.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
 

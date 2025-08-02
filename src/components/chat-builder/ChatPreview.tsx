@@ -49,33 +49,45 @@ export const ChatPreview = ({
       </div>
 
       {/* Chat Widget Display - Direct Component View */}
-      <div className="cwb-preview-area flex items-center justify-center min-h-[500px] bg-gray-50 rounded-lg p-8 border-2 border-dashed border-gray-200">
-        <div className="cwb-widget-showcase">
-          {/* Widget in closed state */}
-          <div className="cwb-showcase-row flex items-center justify-center gap-8 mb-6">
-            <div className="cwb-showcase-label text-sm font-medium text-gray-700">
-              Closed State:
+      <div className="cwb-preview-area flex items-center justify-center min-h-[500px] bg-gray-50 rounded-lg p-8">
+        <div className="cwb-widget-showcase max-w-4xl w-full">
+          {/* Two Column Layout */}
+          <div className="grid md:grid-cols-2 gap-8 items-start">
+            
+            {/* Closed State */}
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-sm font-medium text-gray-700 mb-4">Closed State</div>
+                <div className="relative inline-block">
+                  {/* Message bubble above */}
+                  <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-3 border max-w-[200px] mb-2">
+                    <div className="text-sm text-gray-700">Hi there, have a question? Text us here.</div>
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+                      <div className="w-3 h-3 bg-white border-l border-b transform rotate-45"></div>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    className="cwb-chat-bubble w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105"
+                    style={{ backgroundColor: config.themeColor }}
+                  >
+                    <MessageCircle className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
             </div>
-            <button 
-              className="cwb-chat-bubble w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105"
-              style={{ backgroundColor: config.themeColor }}
-            >
-              <MessageCircle className="w-6 h-6" />
-            </button>
-          </div>
 
-          {/* Widget in open state */}
-          <div className="cwb-showcase-row">
-            <div className="cwb-showcase-label text-sm font-medium text-gray-700 mb-3 text-center">
-              Open State:
-            </div>
-            <div className="cwb-widget-open-demo flex justify-center">
-              <div 
-                className="cwb-chat-window bg-white rounded-2xl shadow-2xl w-80 h-96 flex flex-col overflow-hidden"
-                style={{ 
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' 
-                }}
-              >
+            {/* Open State */}
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-sm font-medium text-gray-700 mb-4">Open State</div>
+                <div className="flex justify-center">
+                  <div 
+                    className="cwb-chat-window bg-white rounded-2xl shadow-2xl w-80 h-96 flex flex-col overflow-hidden"
+                    style={{ 
+                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' 
+                    }}
+                  >
                 {/* Header */}
                 <div 
                   className="cwb-chat-header px-4 py-3 text-white flex items-center justify-between"
@@ -224,8 +236,11 @@ export const ChatPreview = ({
                     </div>
                   </div>
                 )}
+                  </div>
+                </div>
               </div>
             </div>
+            
           </div>
         </div>
       </div>
