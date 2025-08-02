@@ -1,4 +1,23 @@
-# Welcome to your Lovable project
+# Chat Widget Builder
+
+A professional chat widget configuration tool that generates embeddable chat widgets for websites.
+
+## 🚀 Features
+
+- **5-Step Configuration Wizard** with intuitive progress tracking  
+- **Live Preview** showing real-time changes
+- **Theme Customization** with color presets and custom options
+- **Icon Selection** for welcome messages and branding
+- **CSS Conflict Prevention** with unique prefixes (`cwb-`)
+- **Responsive Design** that works on all devices
+
+## 🎯 CSS Conflict Prevention
+
+This widget prevents conflicts with host websites through:
+- **Unique CSS Prefixes**: All classes use `cwb-` prefix (Chat Widget Builder)
+- **Component Isolation**: Scoped styles that don't affect parent elements
+- **Semantic Design Tokens**: Internal design system prevents style bleeding
+- **Shadow DOM Ready**: Can be wrapped for complete isolation
 
 ## Project info
 

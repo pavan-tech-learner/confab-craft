@@ -37,44 +37,39 @@ export const ChatPreview = ({
   };
 
   return (
-    <div className="cwb-preview-container bg-cwb-card rounded-lg p-6 h-full">
-      <div className="cwb-preview-header mb-6">
-        <h3 className="cwb-preview-title text-lg font-semibold text-cwb-foreground">
+    <div className="cwb-preview-container bg-white rounded-xl border border-gray-200 shadow-sm p-6 h-full">
+      {/* Header */}
+      <div className="cwb-preview-header mb-6 text-center">
+        <h3 className="cwb-preview-title text-xl font-semibold text-gray-900 mb-2">
           {title}
         </h3>
-        <p className="cwb-preview-subtitle text-sm text-cwb-muted-foreground">
+        <p className="cwb-preview-subtitle text-sm text-gray-600">
           {subtitle}
         </p>
       </div>
 
-      {/* Preview Area */}
-      <div className="cwb-preview-area relative bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-4 h-[600px] overflow-hidden border">
-        {/* Simulated Website Background */}
-        <div className="w-full h-full bg-white rounded border shadow-sm p-6 relative">
-          <div className="space-y-4">
-            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-            <div className="space-y-2">
-              <div className="h-3 bg-gray-100 rounded w-full"></div>
-              <div className="h-3 bg-gray-100 rounded w-4/5"></div>
-              <div className="h-3 bg-gray-100 rounded w-3/4"></div>
+      {/* Chat Widget Display - Direct Component View */}
+      <div className="cwb-preview-area flex items-center justify-center min-h-[500px] bg-gray-50 rounded-lg p-8 border-2 border-dashed border-gray-200">
+        <div className="cwb-widget-showcase">
+          {/* Widget in closed state */}
+          <div className="cwb-showcase-row flex items-center justify-center gap-8 mb-6">
+            <div className="cwb-showcase-label text-sm font-medium text-gray-700">
+              Closed State:
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-8">
-              <div className="h-20 bg-gray-50 rounded border p-3">
-                <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-2 bg-gray-100 rounded w-full"></div>
-                <div className="h-2 bg-gray-100 rounded w-2/3 mt-1"></div>
-              </div>
-              <div className="h-20 bg-gray-50 rounded border p-3">
-                <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-2 bg-gray-100 rounded w-full"></div>
-                <div className="h-2 bg-gray-100 rounded w-2/3 mt-1"></div>
-              </div>
-            </div>
+            <button 
+              className="cwb-chat-bubble w-14 h-14 rounded-full text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105"
+              style={{ backgroundColor: config.themeColor }}
+            >
+              <MessageCircle className="w-6 h-6" />
+            </button>
           </div>
-          
-          {/* Chat Widget positioned absolutely */}
-          <div className="absolute bottom-4 right-4">
-            {isOpen ? (
+
+          {/* Widget in open state */}
+          <div className="cwb-showcase-row">
+            <div className="cwb-showcase-label text-sm font-medium text-gray-700 mb-3 text-center">
+              Open State:
+            </div>
+            <div className="cwb-widget-open-demo flex justify-center">
               <div 
                 className="cwb-chat-window bg-white rounded-2xl shadow-2xl w-80 h-96 flex flex-col overflow-hidden"
                 style={{ 
@@ -121,15 +116,15 @@ export const ChatPreview = ({
                 <div className="cwb-messages-area flex-1 p-4 overflow-y-auto bg-gray-50">
                   {showUserForm ? (
                     <div className="cwb-user-form space-y-4">
-                      <div 
-                        className="cwb-welcome-bubble bg-white p-3 rounded-lg shadow-sm text-sm flex items-center gap-2"
-                        style={{ borderLeft: `3px solid ${config.themeColor}` }}
-                      >
-                        <span className="text-xl">👋</span>
-                        <span style={{ color: config.themeColor }} className="font-medium">
-                          Welcome!
-                        </span>
-                      </div>
+                       <div 
+                         className="cwb-welcome-bubble bg-white p-3 rounded-lg shadow-sm text-sm flex items-center gap-2"
+                         style={{ borderLeft: `3px solid ${config.themeColor}` }}
+                       >
+                         <span className="text-xl">{config.welcomeMessageIcon || '👋'}</span>
+                         <span style={{ color: config.themeColor }} className="font-medium">
+                           Welcome!
+                         </span>
+                       </div>
                       <div className="cwb-form-message text-sm text-gray-600 mb-4">
                         {config.userInfoMessage}
                       </div>
@@ -230,15 +225,7 @@ export const ChatPreview = ({
                   </div>
                 )}
               </div>
-            ) : (
-              <button 
-                className="cwb-chat-bubble w-14 h-14 rounded-full text-white shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
-                style={{ backgroundColor: config.themeColor }}
-                onClick={() => setIsOpen(true)}
-              >
-                <MessageCircle className="w-6 h-6" />
-              </button>
-            )}
+            </div>
           </div>
         </div>
       </div>

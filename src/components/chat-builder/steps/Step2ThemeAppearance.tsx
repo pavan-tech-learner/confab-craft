@@ -123,6 +123,37 @@ export const Step2ThemeAppearance = ({
             </div>
 
             <div className="cwb-form-field">
+              <Label htmlFor="welcomeMessageIcon" className="cwb-field-label text-sm font-medium text-cwb-foreground">
+                Welcome Message Icon
+              </Label>
+              <div className="cwb-icon-selection mt-1">
+                <div className="cwb-icon-presets grid grid-cols-8 gap-2 mb-3">
+                  {['👋', '😊', '💬', '🎉', '🚀', '❤️', '🌟', '✨'].map((icon) => (
+                    <button
+                      key={icon}
+                      type="button"
+                      className={`cwb-icon-preset w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg transition-all hover:scale-105 ${
+                        config.welcomeMessageIcon === icon 
+                          ? 'border-cwb-primary bg-cwb-primary/10' 
+                          : 'border-cwb-border bg-white hover:border-cwb-primary/50'
+                      }`}
+                      onClick={() => onConfigChange({ welcomeMessageIcon: icon })}
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+                <Input
+                  id="welcomeMessageIcon"
+                  value={config.welcomeMessageIcon || ''}
+                  onChange={(e) => onConfigChange({ welcomeMessageIcon: e.target.value })}
+                  className="cwb-form-input border-cwb-input-border focus:border-cwb-primary focus:ring-cwb-primary"
+                  placeholder="Or enter custom emoji/icon"
+                />
+              </div>
+            </div>
+
+            <div className="cwb-form-field">
               <Label htmlFor="fallbackMessage" className="cwb-field-label text-sm font-medium text-cwb-foreground">
                 Fallback Message
               </Label>

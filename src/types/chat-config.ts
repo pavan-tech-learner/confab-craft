@@ -1,6 +1,7 @@
 export interface ChatConfig {
   themeColor: string;
   welcomeMessage: string;
+  welcomeMessageIcon?: string;
   fallbackMessage: string;
   position: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   showUserStatus: boolean;
@@ -59,6 +60,7 @@ export interface ChatConfig {
 export const defaultConfig: ChatConfig = {
   themeColor: '#6366f1',
   welcomeMessage: 'Hi there! How can we help you today?',
+  welcomeMessageIcon: '👋',
   fallbackMessage: 'Sorry, our agents are currently unavailable. Please leave a message and we\'ll get back to you soon!',
   position: 'bottom-right',
   showUserStatus: true,
