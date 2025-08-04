@@ -24,9 +24,6 @@ export interface ChatConfig {
   customChatIconUrl?: string;
   showChatPrompt: boolean;
   chatPromptMessage: string;
-  /**
-   * Style for the chat prompt bubble (e.g. 'bubble-above', 'inline').
-   */
   promptStyle?: 'bubble-above' | 'inline';
 
   // User information collection
@@ -75,31 +72,13 @@ export interface ChatConfig {
   };
 }
 
+import defaultConfigJson from '../config/default-config.json';
+
 export const defaultConfig: ChatConfig = {
-  themeColor: '#6366f1',
-  welcomeMessage: 'Hi there! How can we help you today?',
+  ...defaultConfigJson as any,
   welcomeMessageIcon: '👋',
   fallbackMessage: 'Sorry, our agents are currently unavailable. Please leave a message and we\'ll get back to you soon!',
-  position: 'bottom-right',
-  showUserStatus: true,
-  showMessageStatus: true,
-  showAgentIcon: true,
-  companyName: 'Your Company',
-  agentName: 'Support Agent',
-
-  // Chat widget icon and prompt defaults
-  chatIcon: 'message-circle',
-  showChatPrompt: true,
-  chatPromptMessage: 'Hi there, have a question? Text us here.',
-
-  requireUserInfo: false,
-  requiredFields: {
-    name: true,
-    email: true,
-    phone: false
-  },
-  userInfoMessage: 'Please provide your details to start the conversation:',
-  agentType: 'human',
+  agentType: 'human' as const,
   openaiConfig: {
     apiKey: '',
     model: 'gpt-3.5-turbo',

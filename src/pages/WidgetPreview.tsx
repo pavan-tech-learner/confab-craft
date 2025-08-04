@@ -60,15 +60,7 @@ export default function WidgetPreview() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.history.back()}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Builder
-              </Button>
+
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Widget Preview</h1>
                 <p className="text-gray-600">See how your chat widget will look on your website</p>
@@ -76,15 +68,6 @@ export default function WidgetPreview() {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownloadConfig}
-                className="flex items-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                Download Config
-              </Button>
               <Button
                 size="sm"
                 onClick={handleGetCode}
@@ -134,44 +117,7 @@ export default function WidgetPreview() {
         </div>
       </div>
 
-      {/* Configuration Summary */}
-      <div className="max-w-7xl mx-auto px-4 pb-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold mb-4">Configuration Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-gray-600">Company:</span>
-              <span className="ml-2">{config.companyName}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Agent:</span>
-              <span className="ml-2">{config.agentName}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Position:</span>
-              <span className="ml-2 capitalize">{config.position.replace('-', ' ')}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Theme Color:</span>
-              <span className="ml-2 flex items-center gap-2">
-                {config.themeColor}
-                <div 
-                  className="w-4 h-4 rounded border"
-                  style={{ backgroundColor: config.themeColor }}
-                ></div>
-              </span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">User Info Required:</span>
-              <span className="ml-2">{config.requireUserInfo ? 'Yes' : 'No'}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Agent Type:</span>
-              <span className="ml-2 capitalize">{config.agentType}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }

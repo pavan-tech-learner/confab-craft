@@ -3,6 +3,7 @@ import { Card, CardContent } from '../../../components/ui/card';
 import { Check, Eye, RotateCcw, Download, Code } from 'lucide-react';
 import { ChatConfig } from '../../../types/chat-config';
 import { useToast } from '../../../hooks/use-toast';
+import { Link } from 'react-router-dom';
 
 interface CompletionStepProps {
   config: ChatConfig;
@@ -114,14 +115,15 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
             </div>
 
             <div className="cwb-primary-actions flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button
-                onClick={handleViewWidget}
-                className="cwb-view-widget-btn w-full sm:w-auto bg-gradient-to-r from-cwb-primary to-cwb-primary-glow hover:from-cwb-primary-glow hover:to-cwb-primary text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                size="lg"
-              >
-                <Eye className="w-5 h-5 mr-2" />
-                View Your Widget
-              </Button>
+              <Link to='/widget-preview' >
+                <Button
+                  className="cwb-view-widget-btn w-full sm:w-auto bg-gradient-to-r from-cwb-primary to-cwb-primary-glow hover:from-cwb-primary-glow hover:to-cwb-primary text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  size="lg"
+                >
+                  <Eye className="w-5 h-5 mr-2" />
+                  View Your Widget
+                </Button>
+              </Link>
 
               <Button
                 variant="outline"
@@ -135,16 +137,6 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
             </div>
 
             <div className="cwb-secondary-actions flex flex-col sm:flex-row gap-3 justify-center items-center">
-              {/* <Button
-                variant="secondary"
-                onClick={handleDownloadConfig}
-                className="cwb-download-btn w-full sm:w-auto"
-                size="sm"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download Config
-              </Button> */}
-
               <Button
                 variant="secondary"
                 // onClick={handleGetEmbedCode}

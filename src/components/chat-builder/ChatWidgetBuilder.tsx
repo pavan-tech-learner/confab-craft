@@ -4,8 +4,8 @@ import { ChatPreview } from './ChatPreview';
 import { Step1CompanyBranding } from './steps/Step1CompanyBranding';
 import { Step2ThemeAppearance } from './steps/Step2ThemeAppearance';
 import { Step3UserInformation } from './steps/Step3UserInformation';
-import { Step4AgentConfiguration } from './steps/Step4AgentConfiguration';
-import { Step5BusinessHours } from './steps/Step5BusinessHours';
+import { Step4BusinessHours } from './steps/Step4BusinessHours';
+import { Step5AgentConfiguration } from './steps/Step5AgentConfiguration';
 import { CompletionStep } from './steps/CompletionStep';
 import { ChatConfig, defaultConfig } from '../../types/chat-config';
 import { useToast } from '../../hooks/use-toast';
@@ -73,12 +73,12 @@ export const ChatWidgetBuilder = () => {
       case 4:
         return {
           title: "Live Preview",
-          subtitle: "See agent configuration"
+          subtitle: "See business hours settings"
         };
       case 5:
         return {
           title: "Live Preview",
-          subtitle: "See business hours settings"
+          subtitle: "See agent configuration"
         };
       default:
         return {
@@ -118,7 +118,7 @@ export const ChatWidgetBuilder = () => {
         );
       case 4:
         return (
-          <Step4AgentConfiguration
+          <Step4BusinessHours
             config={config}
             onConfigChange={handleConfigChange}
             onNext={handleNext}
@@ -127,7 +127,7 @@ export const ChatWidgetBuilder = () => {
         );
       case 5:
         return (
-          <Step5BusinessHours
+          <Step5AgentConfiguration
             config={config}
             onConfigChange={handleConfigChange}
             onFinish={handleFinish}

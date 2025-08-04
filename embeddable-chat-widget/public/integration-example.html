@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Widget Integration Example</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        .example-section {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        
+        .feature-list {
+            background: #ecfdf5;
+            border: 1px solid #d1fae5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .feature-list h3 {
+            color: #065f46;
+            margin-top: 0;
+        }
+        
+        .feature-list ul {
+            color: #047857;
+            padding-left: 20px;
+        }
+        
+        .config-example {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .config-example h3 {
+            color: #92400e;
+            margin-top: 0;
+        }
+        
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #5856eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Chat Widget Integration Example</h1>
+        
+        <p>This page demonstrates how to integrate the embeddable chat widget into any website. The widget appears in the bottom-right corner with complete CSS isolation.</p>
+        
+        <div class="example-section">
+            <h3>📋 Basic Integration</h3>
+            <p>Add this script tag to your website:</p>
+            <pre><code>&lt;script 
+  src="https://your-domain.com/chat-widget.js"
+  data-widget-id="demo-widget-123"
+&gt;&lt;/script&gt;</code></pre>
+        </div>
+        
+        <div class="example-section">
+            <h3>⚙️ Advanced Integration with Configuration</h3>
+            <pre><code>&lt;script 
+  src="https://your-domain.com/chat-widget.js"
+  data-widget-id="demo-widget-123"
+  data-api-url="https://your-api.com"
+  data-container-id="custom-chat-container"
+  data-config='{"themeColor": "#6366f1", "companyName": "Your Company"}'
+&gt;&lt;/script&gt;</code></pre>
+        </div>
+        
+        <div class="config-example">
+            <h3>🎨 Dynamic Configuration</h3>
+            <p>You can also configure the widget via JavaScript:</p>
+            <pre><code>// Set global configuration
+window.chatWidgetConfig = {
+  themeColor: '#6366f1',
+  companyName: 'Your Company',
+  welcomeMessage: 'Hello! How can we help you?',
+  position: 'bottom-right',
+  showChatPrompt: true,
+  chatPromptMessage: 'Need help? Chat with us!'
+};</code></pre>
+        </div>
+        
+        <div class="feature-list">
+            <h3>✨ Key Features</h3>
+            <ul>
+                <li><strong>Complete CSS Isolation</strong> - All classes use <code>cwb-</code> prefix</li>
+                <li><strong>Zero Conflicts</strong> - Won't interfere with your website's styles</li>
+                <li><strong>Responsive Design</strong> - Works on all devices and screen sizes</li>
+                <li><strong>Professional Animations</strong> - Smooth transitions and effects</li>
+                <li><strong>Typing Indicators</strong> - Shows when agents are typing</li>
+                <li><strong>Message Status</strong> - Delivered, seen indicators</li>
+                <li><strong>API Integration</strong> - Fetch config and send messages via API</li>
+                <li><strong>Customizable Themes</strong> - Match your brand colors</li>
+                <li><strong>Multiple Positions</strong> - Bottom-right, bottom-left, etc.</li>
+                <li><strong>User Information Collection</strong> - Optional contact forms</li>
+            </ul>
+        </div>
+        
+        <div class="example-section">
+            <h3>🔌 JavaScript API</h3>
+            <p>Control the widget programmatically:</p>
+            <button onclick="updateTheme()">Change Theme Color</button>
+            <button onclick="updateMessage()">Update Welcome Message</button>
+            <button onclick="getConfig()">Get Current Config</button>
+            <button onclick="destroyWidget()">Destroy Widget</button>
+            
+            <pre><code>// Update widget configuration
+window.ChatWidget.updateConfig({
+  themeColor: '#ff6b6b',
+  companyName: 'New Company Name'
+});
+
+// Get current configuration
+const config = window.ChatWidget.getConfig();
+
+// Destroy widget
+window.ChatWidget.destroy();</code></pre>
+        </div>
+        
+        <div class="example-section">
+            <h3>📡 Event Listeners</h3>
+            <p>Listen to widget events:</p>
+            <pre><code>// Listen for messages
+window.addEventListener('chatWidgetMessageSent', (event) => {
+  console.log('Message sent:', event.detail.message);
+  console.log('Widget ID:', event.detail.widgetId);
+});
+
+// Listen for config updates
+window.addEventListener('chatWidgetConfigFetched', (event) => {
+  console.log('Config loaded:', event.detail.config);
+});</code></pre>
+        </div>
+    </div>
+
+    <!-- Chat Widget Integration -->
+    <script>
+        // Global configuration
+        window.chatWidgetConfig = {
+            themeColor: '#6366f1',
+            companyName: 'Demo Company',
+            agentName: 'Support Agent',
+            welcomeMessage: 'Hello! This is a demo of our embeddable chat widget. How can we help you today?',
+            chatPromptMessage: 'Hi there! Need help? Click to chat with us!',
+            showChatPrompt: true,
+            position: 'bottom-right',
+            showUserStatus: true,
+            showMessageStatus: true,
+            showAgentIcon: true,
+            requireUserInfo: false
+        };
+
+        // Demo functions for buttons
+        function updateTheme() {
+            const colors = ['#6366f1', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            if (window.ChatWidget) {
+                window.ChatWidget.updateConfig({ themeColor: randomColor });
+                alert(`Theme updated to ${randomColor}`);
+            } else {
+                alert('Widget not loaded yet!');
+            }
+        }
+
+        function updateMessage() {
+            const messages = [
+                'Hello! How can we help you today?',
+                'Welcome! We\'re here to assist you.',
+                'Hi there! What can we do for you?',
+                'Greetings! How may we be of service?'
+            ];
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            
+            if (window.ChatWidget) {
+                window.ChatWidget.updateConfig({ welcomeMessage: randomMessage });
+                alert(`Welcome message updated!`);
+            } else {
+                alert('Widget not loaded yet!');
+            }
+        }
+
+        function getConfig() {
+            if (window.ChatWidget) {
+                const config = window.ChatWidget.getConfig();
+                console.log('Current config:', config);
+                alert('Config logged to console!');
+            } else {
+                alert('Widget not loaded yet!');
+            }
+        }
+
+        function destroyWidget() {
+            if (window.ChatWidget) {
+                window.ChatWidget.destroy();
+                alert('Widget destroyed!');
+            } else {
+                alert('Widget not loaded yet!');
+            }
+        }
+
+        // Event listeners
+        window.addEventListener('chatWidgetMessageSent', (event) => {
+            console.log('📤 Message sent:', event.detail);
+        });
+
+        window.addEventListener('chatWidgetConfigFetched', (event) => {
+            console.log('📥 Config fetched:', event.detail);
+        });
+    </script>
+
+    <!-- Load the actual widget (in production, this would be the built widget file) -->
+    <script src="/dist/chat-widget.js" data-widget-id="demo-widget-123"></script>
+</body>
+</html>

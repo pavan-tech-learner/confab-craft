@@ -1,19 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Minimize2, Send, User, MessageSquare, Phone, Headphones, HelpCircle, Mail, Check, CheckCheck, Clock } from 'lucide-react';
-import { ChatConfig } from '../../types/chat-config';
+import { MessageCircle, X, Send, MessageSquare, Phone, Headphones, HelpCircle, Mail, Check, CheckCheck, Clock } from 'lucide-react';
+import { ChatConfig, ChatMessage } from '../types/chat-config';
 
-interface ChatWidgetProps {
+interface EmbeddableChatWidgetProps {
   config: ChatConfig;
-  className?: string;
+  apiBaseUrl?: string;
+  widgetId?: string;
+  onMessageSent?: (message: string) => void;
+  onConfigFetched?: (config: ChatConfig) => void;
 }
 
 // Floating particles component for header animation
 const FloatingParticles = () => (
-  <div className="cwb-floating-particles absolute inset-0 overflow-hidden pointer-events-none">
+  <div className="cwb-floating-particles cwb-absolute cwb-inset-0 cwb-overflow-hidden cwb-pointer-events-none">
     {[...Array(3)].map((_, i) => (
       <div
         key={i}
-        className="cwb-particle absolute w-1 h-1 bg-white/20 rounded-full animate-pulse"
+        className="cwb-particle cwb-absolute cwb-w-1 cwb-h-1 cwb-bg-white-20 cwb-rounded-full cwb-animate-pulse"
         style={{
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
@@ -37,12 +40,18 @@ const adjustColor = (color: string, percent: number) => {
     (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
 };
 
-export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
+export const EmbeddableChatWidget = ({ 
+  config, 
+  apiBaseUrl, 
+  widgetId, 
+  onMessageSent,
+  onConfigFetched 
+}: EmbeddableChatWidgetProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserForm, setShowUserForm] = useState(config.requireUserInfo);
   const [isTyping, setIsTyping] = useState(false);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
       text: config.welcomeMessage,
@@ -51,19 +60,12 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
       status: 'delivered'
     }
   ]);
-
-  // Update welcome message when config changes
-  useEffect(() => {
-    setMessages(prev => prev.map(msg =>
-      msg.id === 1 ? { ...msg, text: config.welcomeMessage } : msg
-    ));
-  }, [config.welcomeMessage]);
   const [userInfo, setUserInfo] = useState({
     name: '',
     email: '',
     phone: ''
   });
-
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when messages change
@@ -74,6 +76,13 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Update welcome message when config changes
+  useEffect(() => {
+    setMessages(prev => prev.map(msg => 
+      msg.id === 1 ? { ...msg, text: config.welcomeMessage } : msg
+    ));
+  }, [config.welcomeMessage]);
 
   // Reset form when config changes
   useEffect(() => {
@@ -99,8 +108,8 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
     ]);
   };
 
-  const handleSendMessage = (text: string) => {
-    const newMessage = {
+  const handleSendMessage = async (text: string) => {
+    const newMessage: ChatMessage = {
       id: messages.length + 1,
       text,
       isUser: true,
@@ -108,6 +117,11 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
       status: 'sending'
     };
     setMessages(prev => [...prev, newMessage]);
+
+    // Call external handler if provided
+    if (onMessageSent) {
+      onMessageSent(text);
+    }
 
     // Update to delivered
     setTimeout(() => {
@@ -124,6 +138,44 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
       ));
     }, 1000);
 
+    // Send to API if configured
+    if (apiBaseUrl && widgetId) {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/chat/${widgetId}/message`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: text,
+            userInfo,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.reply) {
+            setTimeout(() => {
+              const agentResponse: ChatMessage = {
+                id: messages.length + 2,
+                text: data.reply,
+                isUser: false,
+                timestamp: new Date(),
+                status: 'delivered'
+              };
+              setMessages(prev => [...prev, agentResponse]);
+              setIsTyping(false);
+            }, 1000);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Failed to send message:', error);
+      }
+    }
+
+    // Fallback response
     setTimeout(() => {
       const responses = [
         "Thanks for reaching out! I'm here to help you. ✨",
@@ -131,8 +183,8 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
         "I'd be happy to assist you with that! 💫",
         "Absolutely! I'm on it right away. 🌟"
       ];
-
-      const agentResponse = {
+      
+      const agentResponse: ChatMessage = {
         id: messages.length + 2,
         text: responses[Math.floor(Math.random() * responses.length)],
         isUser: false,
@@ -147,13 +199,13 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
   const getPositionClasses = () => {
     switch (config.position) {
       case 'bottom-left':
-        return 'bottom-4 left-4 sm:bottom-6 sm:left-6';
+        return 'cwb-bottom-4 cwb-left-4 sm:cwb-bottom-6 sm:cwb-left-6';
       case 'top-right':
-        return 'top-4 right-4 sm:top-6 sm:right-6';
+        return 'cwb-top-4 cwb-right-4 sm:cwb-top-6 sm:cwb-right-6';
       case 'top-left':
-        return 'top-4 left-4 sm:top-6 sm:left-6';
+        return 'cwb-top-4 cwb-left-4 sm:cwb-top-6 sm:cwb-left-6';
       default:
-        return 'bottom-4 right-4 sm:bottom-6 sm:right-6';
+        return 'cwb-bottom-4 cwb-right-4 sm:cwb-bottom-6 sm:cwb-right-6';
     }
   };
 
@@ -178,7 +230,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
 
   return (
     <>
-      {/* Custom CSS for animations */}
+      {/* Custom CSS for animations and styling */}
       <style>{`
         @keyframes cwb-typing {
           0%, 60%, 100% {
@@ -207,6 +259,15 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
           50% { transform: scale(1.05); }
         }
 
+        @keyframes cwb-glow {
+          0%, 100% {
+            box-shadow: 0 0 20px ${config.themeColor}40, 0 0 40px ${config.themeColor}20, 0 0 60px ${config.themeColor}10;
+          }
+          50% {
+            box-shadow: 0 0 30px ${config.themeColor}60, 0 0 60px ${config.themeColor}40, 0 0 90px ${config.themeColor}20;
+          }
+        }
+
         @keyframes cwb-shimmer {
           0% { background-position: -200px 0; }
           100% { background-position: calc(200px + 100%) 0; }
@@ -228,7 +289,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
         }
 
         .cwb-chat-button-pulse {
-          animation: cwb-buttonPulse 2s infinite;
+          animation: cwb-buttonPulse 2s infinite, cwb-glow 3s ease-in-out infinite;
         }
 
         .cwb-chat-window-enter {
@@ -243,13 +304,21 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
 
         .cwb-glass-effect {
           backdrop-filter: blur(16px);
-          background: rgba(255, 255, 255, 0.95);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.98);
         }
 
-        /* Custom utility classes with cwb- prefix */
+        /* Custom utility classes with cwb- prefix for complete isolation */
+        .cwb-fixed { position: fixed; }
         .cwb-relative { position: relative; }
         .cwb-absolute { position: absolute; }
+        .cwb-bottom-4 { bottom: 1rem; }
+        .cwb-right-4 { right: 1rem; }
+        .cwb-left-4 { left: 1rem; }
+        .cwb-top-4 { top: 1rem; }
+        .cwb-bottom-6 { bottom: 1.5rem; }
+        .cwb-right-6 { right: 1.5rem; }
+        .cwb-left-6 { left: 1.5rem; }
+        .cwb-top-6 { top: 1.5rem; }
         .cwb-bottom-full { bottom: 100%; }
         .cwb-right-0 { right: 0; }
         .cwb-mb-3 { margin-bottom: 0.75rem; }
@@ -257,6 +326,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
         .cwb-rounded-lg { border-radius: 0.5rem; }
         .cwb-shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .cwb-p-3 { padding: 0.75rem; }
+        .cwb-p-4 { padding: 1rem; }
         .cwb-border { border-width: 1px; border-color: #e5e7eb; }
         .cwb-max-w-xs { max-width: 20rem; }
         .cwb-min-w-48 { min-width: 12rem; }
@@ -284,6 +354,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
         .cwb-cursor-pointer { cursor: pointer; }
         .cwb-inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
         .cwb-z-10 { z-index: 10; }
+        .cwb-z-50 { z-index: 50; }
         .cwb-w-6 { width: 1.5rem; }
         .cwb-h-6 { height: 1.5rem; }
         .cwb--top-1 { top: -0.25rem; }
@@ -298,7 +369,6 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
         .cwb-animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
         .cwb-opacity-30 { opacity: 0.3; }
         .cwb-pointer-events-none { pointer-events: none; }
-        .cwb-p-4 { padding: 1rem; }
         .cwb-border-t { border-top-width: 1px; }
         .cwb-border-gray-100 { border-color: #f3f4f6; }
         .cwb-space-x-2 > * + * { margin-left: 0.5rem; }
@@ -310,31 +380,137 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
         .cwb-h-10 { height: 2.5rem; }
         .cwb-w-4 { width: 1rem; }
         .cwb-h-4 { height: 1rem; }
+        .cwb-w-8 { width: 2rem; }
+        .cwb-h-8 { height: 2rem; }
         .cwb-top-full { top: 100%; }
         .cwb-right-4 { right: 1rem; }
         .cwb-w-0 { width: 0; }
         .cwb-h-0 { height: 0; }
+        .cwb-w-1 { width: 0.25rem; }
+        .cwb-h-1 { height: 0.25rem; }
+        .cwb-bg-white-20 { background-color: rgba(255, 255, 255, 0.2); }
+        .cwb-bg-black { background-color: black; }
+        .cwb-bg-opacity-20 { background-color: rgba(0, 0, 0, 0.2); }
+        .cwb-bg-opacity-30 { background-color: rgba(0, 0, 0, 0.3); }
+        .cwb-bg-transparent { background-color: transparent; }
+        .cwb-bg-gray-50 { background-color: #f9fafb; }
+        .cwb-bg-gray-600 { background-color: #4b5563; }
+        .cwb-placeholder-gray-500::placeholder { color: #6b7280; }
+        .cwb-ml-2 { margin-left: 0.5rem; }
+        .cwb-border-black { border-color: #000000; }
+        .cwb-stroke-2 { stroke-width: 2; }
+        .cwb-transition-colors { transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out; }
+        .focus-within\:cwb-border-black:focus-within { border-color: #000000; }
+        .cwb-font-sans { font-family: ui-sans-serif, system-ui, sans-serif; }
+        .cwb-flex-col { flex-direction: column; }
+        .cwb-gap-2 { gap: 0.5rem; }
+        .cwb-gap-3 { gap: 0.75rem; }
+        .cwb-space-y-3 > * + * { margin-top: 0.75rem; }
+        .cwb-space-y-4 > * + * { margin-top: 1rem; }
+        .cwb-max-w-80 { max-width: 20rem; }
+        .cwb-max-w-85 { max-width: 85%; }
+        .cwb-rounded-2xl { border-radius: 1rem; }
+        .cwb-rounded-3xl { border-radius: 1.5rem; }
+        .cwb-rounded-br-lg { border-bottom-right-radius: 0.5rem; }
+        .cwb-rounded-bl-lg { border-bottom-left-radius: 0.5rem; }
+        .cwb-rounded-bl-md { border-bottom-left-radius: 0.375rem; }
+        .cwb-text-center { text-align: center; }
+        .cwb-break-words { word-wrap: break-word; }
+        .cwb-min-w-0 { min-width: 0; }
+        .cwb-flex-shrink-0 { flex-shrink: 0; }
+        .cwb-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .cwb-justify-end { justify-content: flex-end; }
+        .cwb-justify-start { justify-content: flex-start; }
+        .cwb-flex-row-reverse { flex-direction: row-reverse; }
+        .cwb-flex-row { flex-direction: row; }
+        .cwb-bg-gray-50 { background-color: #f9fafb; }
+        .cwb-overflow-y-auto { overflow-y: auto; }
+        .cwb-w-2 { width: 0.5rem; }
+        .cwb-h-2 { height: 0.5rem; }
+        .cwb-bg-gray-400 { background-color: #9ca3af; }
+        .cwb-text-green-600 { color: #16a34a; }
+        .cwb-text-green-500 { color: #22c55e; }
+        .cwb-text-blue-600 { color: #2563eb; }
+        .cwb-text-blue-500 { color: #3b82f6; }
+        .cwb-text-gray-500 { color: #6b7280; }
+        .cwb-w-72 { width: 18rem; }
+        .cwb-h-80 { height: 20rem; }
+        .cwb-w-80 { width: 20rem; }
+        .cwb-h-96 { height: 24rem; }
+        .cwb-w-96 { width: 24rem; }
+        .cwb-h-520 { height: 32.5rem; }
+        .cwb-w-420 { width: 26.25rem; }
+        .cwb-h-580 { height: 36.25rem; }
 
         /* Hover states */
         .cwb-chat-bubble:hover { transform: scale(1.1); }
         .cwb-send-btn:hover { opacity: 0.9; }
         .cwb-text-gray-400:hover { color: #6b7280; }
-
-        /* Focus states */
-        .cwb-message-input:focus { outline: none; ring: 2px; ring-opacity: 0.5; }
-
-        /* Scale utilities */
         .cwb-scale-110:hover { transform: scale(1.1); }
         .cwb-shadow-3xl:hover { box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25); }
         .cwb-opacity-90:hover { opacity: 0.9; }
+
+        /* Focus states */
+        .cwb-message-input:focus { outline: none; ring: 2px; ring-opacity: 0.5; }
         .cwb-outline-none:focus { outline: none; }
         .cwb-ring-2:focus { ring: 2px; }
         .cwb-ring-opacity-50:focus { ring-opacity: 0.5; }
         .cwb-transition-opacity { transition: opacity 0.15s ease-in-out; }
+
+        /* Responsive utilities */
+        @media (min-width: 640px) {
+          .sm\\:cwb-bottom-6 { bottom: 1.5rem; }
+          .sm\\:cwb-right-6 { right: 1.5rem; }
+          .sm\\:cwb-left-6 { left: 1.5rem; }
+          .sm\\:cwb-top-6 { top: 1.5rem; }
+          .sm\\:cwb-w-80 { width: 20rem; }
+          .sm\\:cwb-h-96 { height: 24rem; }
+          .sm\\:cwb-rounded-3xl { border-radius: 1.5rem; }
+          .sm\\:cwb-p-4 { padding: 1rem; }
+          .sm\\:cwb-gap-3 { gap: 0.75rem; }
+          .sm\\:cwb-space-y-4 > * + * { margin-top: 1rem; }
+          .sm\\:cwb-w-8 { width: 2rem; }
+          .sm\\:cwb-h-8 { height: 2rem; }
+          .sm\\:cwb-w-10 { width: 2.5rem; }
+          .sm\\:cwb-h-10 { height: 2.5rem; }
+          .sm\\:cwb-text-base { font-size: 1rem; line-height: 1.5rem; }
+          .sm\\:cwb-text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+          .sm\\:cwb-w-5 { width: 1.25rem; }
+          .sm\\:cwb-h-5 { height: 1.25rem; }
+          .sm\\:cwb-w-6 { width: 1.5rem; }
+          .sm\\:cwb-h-6 { height: 1.5rem; }
+          .sm\\:cwb-p-3 { padding: 0.75rem; }
+          .sm\\:cwb-w-3 { width: 0.75rem; }
+          .sm\\:cwb-h-3 { height: 0.75rem; }
+          .sm\\:cwb-gap-2 { gap: 0.5rem; }
+          .sm\\:cwb-max-w-80 { max-width: 80%; }
+        }
+
+        @media (min-width: 768px) {
+          .md\\:cwb-w-96 { width: 24rem; }
+          .md\\:cwb-h-520 { height: 32.5rem; }
+          .md\\:cwb-p-5 { padding: 1.25rem; }
+          .md\\:cwb-gap-4 { gap: 1rem; }
+          .md\\:cwb-w-12 { width: 3rem; }
+          .md\\:cwb-h-12 { height: 3rem; }
+          .md\\:cwb-text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+          .md\\:cwb-w-8 { width: 2rem; }
+          .md\\:cwb-h-8 { height: 2rem; }
+          .md\\:cwb-w-10 { width: 2.5rem; }
+          .md\\:cwb-h-10 { height: 2.5rem; }
+          .md\\:cwb-w-6 { width: 1.5rem; }
+          .md\\:cwb-h-6 { height: 1.5rem; }
+          .md\\:cwb-p-4 { padding: 1rem; }
+        }
+
+        @media (min-width: 1024px) {
+          .lg\\:cwb-w-420 { width: 26.25rem; }
+          .lg\\:cwb-h-580 { height: 36.25rem; }
+        }
       `}</style>
 
       <div
-        className={`cwb-chat-widget fixed font-sans transition-all duration-500 ${getPositionClasses()} z-50 ${className}`}
+        className={`cwb-chat-widget cwb-fixed cwb-font-sans cwb-transition-all cwb-duration-500 ${getPositionClasses()} cwb-z-50`}
         style={{
           '--widget-primary': config.themeColor,
         } as React.CSSProperties}
@@ -394,39 +570,40 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
             />
           </div>
         )}
+
         {/* Chat Window */}
         {isOpen && (
-          <div className="w-72 h-80 sm:w-80 sm:h-96 md:w-96 md:h-[520px] lg:w-[420px] lg:h-[580px] cwb-glass-effect rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden cwb-chat-window-enter">
+          <div className="cwb-w-72 cwb-h-80 sm:cwb-w-80 sm:cwb-h-96 md:cwb-w-96 md:cwb-h-520 lg:cwb-w-420 lg:cwb-h-580 cwb-glass-effect cwb-rounded-2xl sm:cwb-rounded-3xl cwb-shadow-2xl cwb-flex cwb-flex-col cwb-overflow-hidden cwb-chat-window-enter">
             {/* Enhanced Header */}
             <div
-              className="cwb-chat-header relative p-3 sm:p-4 md:p-5 text-white flex items-center justify-between rounded-t-2xl sm:rounded-t-3xl overflow-hidden"
+              className="cwb-chat-header cwb-relative cwb-p-3 sm:cwb-p-4 md:cwb-p-5 cwb-text-white cwb-flex cwb-items-center cwb-justify-between cwb-rounded-t-2xl sm:cwb-rounded-t-3xl cwb-overflow-hidden"
               style={{
                 background: `linear-gradient(135deg, ${config.themeColor} 0%, ${adjustColor(config.themeColor, 30)} 100%)`
               }}
             >
               <FloatingParticles />
 
-              <div className="cwb-header-content flex items-center gap-2 sm:gap-3 md:gap-4 relative z-10 min-w-0 flex-1">
+              <div className="cwb-header-content cwb-flex cwb-items-center cwb-gap-2 sm:cwb-gap-3 md:cwb-gap-4 cwb-relative cwb-z-10 cwb-min-w-0 cwb-flex-1">
                 {config.showAgentIcon && (
-                  <div className="cwb-agent-avatar flex-shrink-0">
+                  <div className="cwb-agent-avatar cwb-flex-shrink-0">
                     {config.companyLogo ? (
                       <div
-                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full p-0.5"
+                        className="cwb-w-8 cwb-h-8 sm:cwb-w-10 sm:cwb-h-10 md:cwb-w-12 md:cwb-h-12 cwb-rounded-full cwb-p-0.5"
                         style={{
                           background: `linear-gradient(45deg, ${config.themeColor}, ${adjustColor(config.themeColor, 40)})`
                         }}
                       >
-                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+                        <div className="cwb-w-full cwb-h-full cwb-bg-white cwb-rounded-full cwb-flex cwb-items-center cwb-justify-center">
                           <img
                             src={config.companyLogo}
                             alt="Agent"
-                            className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full object-cover"
+                            className="cwb-w-5 cwb-h-5 sm:cwb-w-6 sm:cwb-h-6 md:cwb-w-8 md:cwb-h-8 cwb-rounded-full cwb-object-cover"
                           />
                         </div>
                       </div>
                     ) : (
                       <div
-                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg"
+                        className="cwb-w-8 cwb-h-8 sm:cwb-w-10 sm:cwb-h-10 md:cwb-w-12 md:cwb-h-12 cwb-rounded-full cwb-flex cwb-items-center cwb-justify-center cwb-text-white cwb-text-sm cwb-font-bold cwb-shadow-lg"
                         style={{
                           background: `linear-gradient(135deg, ${config.themeColor} 0%, ${adjustColor(config.themeColor, 20)} 100%)`
                         }}
@@ -437,36 +614,36 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                   </div>
                 )}
 
-                <div className="cwb-header-text min-w-0 flex-1">
-                  <div className="cwb-company-name font-bold text-sm sm:text-base md:text-lg truncate">
+                <div className="cwb-header-text cwb-min-w-0 cwb-flex-1">
+                  <div className="cwb-company-name cwb-font-bold cwb-text-sm sm:cwb-text-base md:cwb-text-lg cwb-truncate">
                     {config.companyName}
                   </div>
                   {config.showUserStatus && (
-                    <div className="cwb-agent-status flex items-center gap-1 sm:gap-2 text-xs sm:text-sm opacity-90">
-                      <div className="cwb-status-dot w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <div className="cwb-agent-status cwb-flex cwb-items-center cwb-gap-1 sm:cwb-gap-2 cwb-text-xs sm:cwb-text-sm cwb-opacity-90">
+                      <div className="cwb-status-dot cwb-w-2 cwb-h-2 cwb-rounded-full cwb-bg-green-400 cwb-animate-pulse" />
                       <span>{config.agentName} is online</span>
-                      <span className="opacity-60">• Live</span>
+                      <span className="cwb-opacity-60">• Live</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="cwb-header-actions flex items-center gap-1 sm:gap-2 relative z-10">
+              <div className="cwb-header-actions cwb-flex cwb-items-center cwb-gap-1 sm:cwb-gap-2 cwb-relative cwb-z-10">
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="cwb-close-btn p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-all duration-200 hover:scale-110"
+                  className="cwb-close-btn cwb-w-8 cwb-h-8 cwb-bg-gray-600 cwb-bg-opacity-80 hover:cwb-bg-opacity-100 cwb-rounded-full cwb-transition-all cwb-duration-200 hover:cwb-scale-110 cwb-flex cwb-items-center cwb-justify-center"
                 >
-                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <X className="cwb-w-4 cwb-h-4 cwb-text-white cwb-stroke-2" />
                 </button>
               </div>
             </div>
 
             {/* Messages Area */}
-            <div className="cwb-messages-area flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gray-50">
+            <div className="cwb-messages-area cwb-flex-1 cwb-overflow-y-auto cwb-p-3 sm:cwb-p-4 cwb-space-y-3 sm:cwb-space-y-4 cwb-bg-white">
               {showUserForm ? (
-                <div className="cwb-user-form space-y-4">
-                  <div className="text-center mb-4">
-                    <p className="text-sm text-gray-600">{config.userInfoMessage}</p>
+                <div className="cwb-user-form cwb-space-y-4">
+                  <div className="cwb-text-center cwb-mb-4">
+                    <p className="cwb-text-sm cwb-text-gray-600">{config.userInfoMessage}</p>
                   </div>
 
                   {config.requiredFields.name && (
@@ -476,7 +653,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                       value={userInfo.name}
                       onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
                       required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                      className="cwb-w-full cwb-px-3 cwb-py-2 cwb-border cwb-border-gray-200 cwb-rounded-md cwb-text-sm focus:cwb-outline-none focus:cwb-ring-2 focus:cwb-ring-opacity-50"
                       style={{
                         '--tw-ring-color': config.themeColor,
                       } as React.CSSProperties}
@@ -490,7 +667,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                       value={userInfo.email}
                       onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
                       required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                      className="cwb-w-full cwb-px-3 cwb-py-2 cwb-border cwb-border-gray-200 cwb-rounded-md cwb-text-sm focus:cwb-outline-none focus:cwb-ring-2 focus:cwb-ring-opacity-50"
                       style={{
                         '--tw-ring-color': config.themeColor,
                       } as React.CSSProperties}
@@ -504,7 +681,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                       value={userInfo.phone}
                       onChange={(e) => setUserInfo(prev => ({ ...prev, phone: e.target.value }))}
                       required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                      className="cwb-w-full cwb-px-3 cwb-py-2 cwb-border cwb-border-gray-200 cwb-rounded-md cwb-text-sm focus:cwb-outline-none focus:cwb-ring-2 focus:cwb-ring-opacity-50"
                       style={{
                         '--tw-ring-color': config.themeColor,
                       } as React.CSSProperties}
@@ -513,7 +690,7 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
 
                   <button
                     type="submit"
-                    className="w-full py-2 text-white rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+                    className="cwb-w-full cwb-py-2 cwb-text-white cwb-rounded-md cwb-text-sm cwb-font-medium hover:cwb-opacity-90 cwb-transition-opacity"
                     style={{ backgroundColor: config.themeColor }}
                     onClick={handleStartChat}
                   >
@@ -525,31 +702,31 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                   {messages.map((message, index) => (
                     <div
                       key={message.id}
-                      className={`cwb-message flex cwb-message-enter ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                      className={`cwb-message cwb-flex cwb-message-enter ${message.isUser ? 'cwb-justify-end' : 'cwb-justify-start'}`}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
-                      <div className={`flex gap-2 sm:gap-3 max-w-[85%] sm:max-w-[80%] ${message.isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <div className={`cwb-flex cwb-gap-2 sm:cwb-gap-3 cwb-max-w-85 sm:cwb-max-w-80 ${message.isUser ? 'cwb-flex-row-reverse' : 'cwb-flex-row'}`}>
                         {/* Agent Icon */}
                         {!message.isUser && config.showAgentIcon && (
-                          <div className="flex-shrink-0">
+                          <div className="cwb-flex-shrink-0">
                             {config.companyLogo ? (
                               <div
-                                className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full p-0.5"
+                                className="cwb-w-6 cwb-h-6 sm:cwb-w-8 sm:cwb-h-8 md:cwb-w-10 md:cwb-h-10 cwb-rounded-full cwb-p-0.5"
                                 style={{
                                   background: `linear-gradient(45deg, ${config.themeColor}, ${adjustColor(config.themeColor, 40)})`
                                 }}
                               >
-                                <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+                                <div className="cwb-w-full cwb-h-full cwb-bg-white cwb-rounded-full cwb-flex cwb-items-center cwb-justify-center">
                                   <img
                                     src={config.companyLogo}
                                     alt="Agent"
-                                    className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full object-cover"
+                                    className="cwb-w-4 cwb-h-4 sm:cwb-w-5 sm:cwb-h-5 md:cwb-w-6 md:cwb-h-6 cwb-rounded-full cwb-object-cover"
                                   />
                                 </div>
                               </div>
                             ) : (
                               <div
-                                className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold shadow-lg"
+                                className="cwb-w-6 cwb-h-6 sm:cwb-w-8 sm:cwb-h-8 md:cwb-w-10 md:cwb-h-10 cwb-rounded-full cwb-flex cwb-items-center cwb-justify-center cwb-text-white cwb-text-xs sm:cwb-text-sm cwb-font-bold cwb-shadow-lg"
                                 style={{
                                   background: `linear-gradient(135deg, ${config.themeColor} 0%, ${adjustColor(config.themeColor, 20)} 100%)`
                                 }}
@@ -560,13 +737,13 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                           </div>
                         )}
 
-                        <div className="flex flex-col gap-1 sm:gap-2 min-w-0">
+                        <div className="cwb-flex cwb-flex-col cwb-gap-1 sm:cwb-gap-2 cwb-min-w-0">
                           <div
                             className={`
-                              p-2 sm:p-3 md:p-4 rounded-2xl sm:rounded-3xl text-xs sm:text-sm break-words shadow-lg transition-all duration-200 hover:shadow-xl
+                              cwb-p-2 sm:cwb-p-3 md:cwb-p-4 cwb-rounded-2xl sm:cwb-rounded-3xl cwb-text-xs sm:cwb-text-sm cwb-break-words cwb-shadow-lg cwb-transition-all cwb-duration-200 hover:cwb-shadow-xl
                               ${message.isUser
-                                ? 'text-white rounded-br-lg transform hover:scale-[1.02]'
-                                : 'bg-white border border-gray-100 rounded-bl-lg shadow-md hover:shadow-lg'
+                                ? 'cwb-text-white cwb-rounded-br-lg transform hover:cwb-scale-102'
+                                : 'cwb-bg-white cwb-border cwb-border-gray-100 cwb-rounded-bl-lg cwb-shadow-md hover:cwb-shadow-lg'
                               }
                             `}
                             style={message.isUser ? {
@@ -578,23 +755,23 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
 
                           {/* Message Status */}
                           {config.showMessageStatus && message.isUser && message.status && (
-                            <div className="flex items-center justify-end gap-1 sm:gap-2 text-xs text-gray-500">
+                            <div className="cwb-flex cwb-items-center cwb-justify-end cwb-gap-1 sm:cwb-gap-2 cwb-text-xs cwb-text-gray-500">
                               {message.status === 'sending' && (
                                 <>
-                                  <Clock className="w-2 h-2 sm:w-3 sm:h-3 animate-spin" />
+                                  <Clock className="cwb-w-2 cwb-h-2 sm:cwb-w-3 sm:cwb-h-3 cwb-animate-spin" />
                                   <span>Sending</span>
                                 </>
                               )}
                               {message.status === 'delivered' && (
                                 <>
-                                  <Check className="w-2 h-2 sm:w-3 sm:h-3 text-green-500" />
-                                  <span className="text-green-600">Delivered</span>
+                                  <Check className="cwb-w-2 cwb-h-2 sm:cwb-w-3 sm:cwb-h-3 cwb-text-green-500" />
+                                  <span className="cwb-text-green-600">Delivered</span>
                                 </>
                               )}
                               {message.status === 'seen' && (
                                 <>
-                                  <CheckCheck className="w-2 h-2 sm:w-3 sm:h-3 text-blue-500" />
-                                  <span className="text-blue-600 font-medium">Seen</span>
+                                  <CheckCheck className="cwb-w-2 cwb-h-2 sm:cwb-w-3 sm:cwb-h-3 cwb-text-blue-500" />
+                                  <span className="cwb-text-blue-600 cwb-font-medium">Seen</span>
                                 </>
                               )}
                             </div>
@@ -606,12 +783,12 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
 
                   {/* Typing Indicator */}
                   {isTyping && (
-                    <div className="cwb-typing-indicator flex justify-start">
-                      <div className="bg-white p-3 rounded-2xl rounded-bl-md shadow-sm max-w-[80%]">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="cwb-typing-indicator cwb-flex cwb-justify-start">
+                      <div className="cwb-bg-white cwb-p-3 cwb-rounded-2xl cwb-rounded-bl-md cwb-shadow-sm cwb-max-w-80">
+                        <div className="cwb-flex cwb-space-x-1">
+                          <div className="cwb-w-2 cwb-h-2 cwb-bg-gray-400 cwb-rounded-full cwb-animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="cwb-w-2 cwb-h-2 cwb-bg-gray-400 cwb-rounded-full cwb-animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="cwb-w-2 cwb-h-2 cwb-bg-gray-400 cwb-rounded-full cwb-animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
                       </div>
                     </div>
@@ -623,15 +800,12 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
 
             {/* Input Area */}
             {!showUserForm && (
-              <div className="cwb-input-area cwb-p-4 cwb-bg-white cwb-border-t cwb-border-gray-100">
-                <div className="cwb-input-container cwb-flex cwb-space-x-2">
+              <div className="cwb-input-area cwb-p-4 cwb-bg-white">
+                <div className="cwb-input-container cwb-relative cwb-flex cwb-items-center cwb-bg-gray-50 cwb-rounded-full cwb-border cwb-border-gray-200 focus-within:cwb-border-black cwb-px-4 cwb-py-2 cwb-transition-colors">
                   <input
                     type="text"
                     placeholder="Type your message..."
-                    className="cwb-message-input cwb-flex-1 cwb-px-3 cwb-py-2 cwb-border cwb-border-gray-200 cwb-rounded-full cwb-text-sm focus:cwb-outline-none focus:cwb-ring-2 focus:cwb-ring-opacity-50"
-                    style={{
-                      '--tw-ring-color': config.themeColor,
-                    } as React.CSSProperties}
+                    className="cwb-message-input cwb-flex-1 cwb-bg-transparent cwb-border-0 cwb-outline-none cwb-text-sm cwb-placeholder-gray-500"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                         handleSendMessage(e.currentTarget.value);
@@ -640,8 +814,11 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
                     }}
                   />
                   <button
-                    className="cwb-send-btn cwb-w-10 cwb-h-10 cwb-rounded-full cwb-text-white cwb-flex cwb-items-center cwb-justify-center hover:cwb-opacity-90 cwb-transition-opacity cwb-border-0"
-                    style={{ backgroundColor: config.themeColor }}
+                    className="cwb-send-btn cwb-w-8 cwb-h-8 cwb-rounded-full cwb-text-white cwb-flex cwb-items-center cwb-justify-center hover:cwb-opacity-90 cwb-transition-all cwb-duration-200 hover:cwb-scale-110 cwb-border-0 cwb-ml-2"
+                    style={{
+                      backgroundColor: config.themeColor,
+                      boxShadow: `0 2px 8px ${config.themeColor}40`
+                    }}
                     onClick={(e) => {
                       const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
                       if (input && input.value.trim()) {
@@ -661,4 +838,3 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
     </>
   );
 };
-
