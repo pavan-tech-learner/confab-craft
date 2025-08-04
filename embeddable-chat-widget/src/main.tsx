@@ -16,7 +16,7 @@ const devConfig = {
   showUserStatus: true,
   showMessageStatus: true,
   showAgentIcon: true,
-  requireUserInfo: false
+  requireUserInfo: true
 };
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -11,7 +11,7 @@
   "chatIcon": "message-circle",
   "showChatPrompt": true,
   "chatPromptMessage": "Hi there! Need help? Click to chat with us!",
-  "requireUserInfo": false,
+  "requireUserInfo": true,
   "userInfoMessage": "Please provide your details so we can assist you better.",
   "requiredFields": {
     "name": true,

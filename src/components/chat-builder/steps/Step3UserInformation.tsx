@@ -2,7 +2,7 @@ import { Info, MessageSquare } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Label } from '../../ui/label';
 import { Textarea } from '../../ui/textarea';
-import { Switch } from '../../ui/switch';
+
 import { Checkbox } from '../../ui/checkbox';
 import { ChatConfig } from '../../../types/chat-config';
 
@@ -20,13 +20,23 @@ export const Step3UserInformation = ({
   onPrevious
 }: Step3UserInformationProps) => {
   const handleRequiredFieldChange = (field: keyof ChatConfig['requiredFields'], checked: boolean) => {
-    onConfigChange({
-      requiredFields: {
-        ...config.requiredFields,
-        [field]: checked
-      }
-    });
+    const newRequiredFields = {
+      ...config.requiredFields,
+      [field]: checked
+    };
+
+    // Ensure at least 2 fields are required
+    const requiredCount = Object.values(newRequiredFields).filter(Boolean).length;
+    if (requiredCount >= 2 || checked) {
+      onConfigChange({
+        requireUserInfo: true, // Always keep this true
+        requiredFields: newRequiredFields
+      });
+    }
   };
+
+  // Count currently required fields
+  const requiredFieldsCount = Object.values(config.requiredFields).filter(Boolean).length;
 
   return (
     <div className="cwb-step3-container bg-cwb-card rounded-lg p-6">
@@ -40,31 +50,28 @@ export const Step3UserInformation = ({
           User Information Collection
         </h2>
         <p className="cwb-section-subtitle text-cwb-muted-foreground">
-          Configure what information to collect from users before chat
+          User information collection is mandatory. Select at least 2 required fields.
         </p>
       </div>
 
       <div className="cwb-form-content space-y-6">
-        {/* Main Toggle */}
+        {/* Status Info */}
         <div className="cwb-form-section">
-          <div className="cwb-switch-field flex items-center justify-between p-4 bg-cwb-muted/30 rounded-lg">
-            <div className="cwb-switch-label">
-              <Label className="text-sm font-medium text-cwb-foreground">
-                Require user information before chat
-              </Label>
+          <div className="cwb-status-info p-4 bg-cwb-primary/10 border border-cwb-primary/20 rounded-lg">
+            <div className="cwb-status-content">
+              <p className="text-sm font-medium text-cwb-primary">
+                ✓ User Information Collection is Mandatory
+              </p>
               <p className="text-xs text-cwb-muted-foreground mt-1">
-                Collect user details before starting the conversation
+                Users must provide their details before starting the conversation. At least 2 fields are required.
+              </p>
+              <p className="text-xs text-cwb-foreground mt-2">
+                Currently required fields: <span className="font-medium">{requiredFieldsCount}</span>
+                {requiredFieldsCount < 2 && <span className="text-red-500 ml-1">(Minimum 2 required)</span>}
               </p>
             </div>
-            <Switch
-              checked={config.requireUserInfo}
-              onCheckedChange={(checked) => onConfigChange({ requireUserInfo: checked })}
-            />
           </div>
         </div>
-
-        {config.requireUserInfo && (
-          <>
             {/* Message Configuration */}
             <div className="cwb-form-section">
               <div className="cwb-section-header mb-4">
@@ -92,66 +99,91 @@ export const Step3UserInformation = ({
                   Required Fields
                 </h3>
                 <p className="text-sm text-cwb-muted-foreground">
-                  Select which fields are required for users to fill
+                  Select at least 2 fields that users must fill to continue
                 </p>
               </div>
 
               <div className="cwb-checkbox-fields space-y-4">
-                <div className="cwb-checkbox-field flex items-center space-x-3">
-                  <Checkbox
-                    id="requireName"
-                    checked={config.requiredFields.name}
-                    onCheckedChange={(checked) => handleRequiredFieldChange('name', checked as boolean)}
-                    className="border-cwb-border data-[state=checked]:bg-cwb-primary data-[state=checked]:border-cwb-primary"
-                  />
-                  <Label htmlFor="requireName" className="text-sm font-medium text-cwb-foreground cursor-pointer">
-                    Name
-                  </Label>
+                <div className="cwb-checkbox-field flex items-center justify-between p-3 bg-cwb-muted/20 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="requireName"
+                      checked={config.requiredFields.name}
+                      onCheckedChange={(checked) => handleRequiredFieldChange('name', checked as boolean)}
+                      className="border-cwb-border data-[state=checked]:bg-cwb-primary data-[state=checked]:border-cwb-primary"
+                      disabled={config.requiredFields.name && requiredFieldsCount <= 2}
+                    />
+                    <Label htmlFor="requireName" className="text-sm font-medium text-cwb-foreground cursor-pointer">
+                      Name
+                    </Label>
+                  </div>
+                  {config.requiredFields.name && requiredFieldsCount <= 2 && (
+                    <span className="text-xs text-cwb-muted-foreground">Required (minimum)</span>
+                  )}
                 </div>
 
-                <div className="cwb-checkbox-field flex items-center space-x-3">
-                  <Checkbox
-                    id="requireEmail"
-                    checked={config.requiredFields.email}
-                    onCheckedChange={(checked) => handleRequiredFieldChange('email', checked as boolean)}
-                    className="border-cwb-border data-[state=checked]:bg-cwb-primary data-[state=checked]:border-cwb-primary"
-                  />
-                  <Label htmlFor="requireEmail" className="text-sm font-medium text-cwb-foreground cursor-pointer">
-                    Email Address
-                  </Label>
+                <div className="cwb-checkbox-field flex items-center justify-between p-3 bg-cwb-muted/20 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="requireEmail"
+                      checked={config.requiredFields.email}
+                      onCheckedChange={(checked) => handleRequiredFieldChange('email', checked as boolean)}
+                      className="border-cwb-border data-[state=checked]:bg-cwb-primary data-[state=checked]:border-cwb-primary"
+                      disabled={config.requiredFields.email && requiredFieldsCount <= 2}
+                    />
+                    <Label htmlFor="requireEmail" className="text-sm font-medium text-cwb-foreground cursor-pointer">
+                      Email Address
+                    </Label>
+                  </div>
+                  {config.requiredFields.email && requiredFieldsCount <= 2 && (
+                    <span className="text-xs text-cwb-muted-foreground">Required (minimum)</span>
+                  )}
                 </div>
 
-                <div className="cwb-checkbox-field flex items-center space-x-3">
-                  <Checkbox
-                    id="requirePhone"
-                    checked={config.requiredFields.phone}
-                    onCheckedChange={(checked) => handleRequiredFieldChange('phone', checked as boolean)}
-                    className="border-cwb-border data-[state=checked]:bg-cwb-primary data-[state=checked]:border-cwb-primary"
-                  />
-                  <Label htmlFor="requirePhone" className="text-sm font-medium text-cwb-foreground cursor-pointer">
-                    Phone Number
-                  </Label>
+                <div className="cwb-checkbox-field flex items-center justify-between p-3 bg-cwb-muted/20 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      id="requirePhone"
+                      checked={config.requiredFields.phone}
+                      onCheckedChange={(checked) => handleRequiredFieldChange('phone', checked as boolean)}
+                      className="border-cwb-border data-[state=checked]:bg-cwb-primary data-[state=checked]:border-cwb-primary"
+                      disabled={config.requiredFields.phone && requiredFieldsCount <= 2}
+                    />
+                    <Label htmlFor="requirePhone" className="text-sm font-medium text-cwb-foreground cursor-pointer">
+                      Phone Number
+                    </Label>
+                  </div>
+                  {config.requiredFields.phone && requiredFieldsCount <= 2 && (
+                    <span className="text-xs text-cwb-muted-foreground">Required (minimum)</span>
+                  )}
                 </div>
               </div>
-            </div>
-          </>
-        )}
+
+              {requiredFieldsCount < 2 && (
+                <div className="cwb-validation-message p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">
+                    ⚠️ Please select at least 2 required fields to continue.
+                  </p>
+                </div>
+              )}
+        </div>
       </div>
 
       {/* Navigation */}
       <div className="cwb-step-navigation flex justify-between items-center mt-8 pt-6 border-t border-cwb-border">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={onPrevious}
           className="cwb-nav-btn text-cwb-muted-foreground hover:text-cwb-foreground"
         >
           Previous
         </Button>
-        <Button 
+        <Button
           onClick={onNext}
-          className="cwb-nav-btn bg-cwb-primary text-cwb-primary-foreground hover:bg-cwb-primary-dark"
+          disabled={requiredFieldsCount < 2}
+          className="cwb-nav-btn bg-cwb-primary text-cwb-primary-foreground hover:bg-cwb-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Next
+          Next {requiredFieldsCount < 2 && '(Select 2+ fields)'}
         </Button>
       </div>
     </div>

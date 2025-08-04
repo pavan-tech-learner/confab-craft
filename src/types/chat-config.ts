@@ -92,7 +92,7 @@ export const defaultConfig: ChatConfig = {
   showChatPrompt: true,
   chatPromptMessage: 'Hi there, have a question? Text us here.',
 
-  requireUserInfo: false,
+  requireUserInfo: true,
   requiredFields: {
     name: true,
     email: true,

@@ -465,55 +465,81 @@ export const ChatWidget = ({ config, className = "" }: ChatWidgetProps) => {
             <div className="cwb-messages-area flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gray-50">
               {showUserForm ? (
                 <div className="cwb-user-form space-y-4">
-                  <div className="text-center mb-4">
-                    <p className="text-sm text-gray-600">{config.userInfoMessage}</p>
+                  <div
+                    className="cwb-welcome-bubble bg-white p-3 rounded-lg shadow-sm text-sm flex items-center gap-2"
+                    style={{ borderLeft: `3px solid ${config.themeColor}` }}
+                  >
+                    <span className="text-xl">👋</span>
+                    <span style={{ color: config.themeColor }} className="font-medium">
+                      Welcome!
+                    </span>
+                  </div>
+                  <div className="cwb-form-message text-sm text-gray-600 mb-4">
+                    {config.userInfoMessage}
                   </div>
 
                   {config.requiredFields.name && (
-                    <input
-                      type="text"
-                      placeholder="Your Name"
-                      value={userInfo.name}
-                      onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
-                      required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                      style={{
-                        '--tw-ring-color': config.themeColor,
-                      } as React.CSSProperties}
-                    />
+                    <div className="cwb-form-field">
+                      <label className="cwb-field-label text-xs text-gray-600 mb-1 block">
+                        Name *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Your name"
+                        value={userInfo.name}
+                        onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
+                        required
+                        className="cwb-form-input w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                        style={{
+                          '--tw-ring-color': config.themeColor,
+                          'focusRingColor': config.themeColor
+                        } as React.CSSProperties}
+                      />
+                    </div>
                   )}
 
                   {config.requiredFields.email && (
-                    <input
-                      type="email"
-                      placeholder="Your Email"
-                      value={userInfo.email}
-                      onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
-                      required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                      style={{
-                        '--tw-ring-color': config.themeColor,
-                      } as React.CSSProperties}
-                    />
+                    <div className="cwb-form-field">
+                      <label className="cwb-field-label text-xs text-gray-600 mb-1 block">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={userInfo.email}
+                        onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
+                        required
+                        className="cwb-form-input w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                        style={{
+                          '--tw-ring-color': config.themeColor,
+                          'focusRingColor': config.themeColor
+                        } as React.CSSProperties}
+                      />
+                    </div>
                   )}
 
                   {config.requiredFields.phone && (
-                    <input
-                      type="tel"
-                      placeholder="Your Phone"
-                      value={userInfo.phone}
-                      onChange={(e) => setUserInfo(prev => ({ ...prev, phone: e.target.value }))}
-                      required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                      style={{
-                        '--tw-ring-color': config.themeColor,
-                      } as React.CSSProperties}
-                    />
+                    <div className="cwb-form-field">
+                      <label className="cwb-field-label text-xs text-gray-600 mb-1 block">
+                        Phone *
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="+1 (555) 123-4567"
+                        value={userInfo.phone}
+                        onChange={(e) => setUserInfo(prev => ({ ...prev, phone: e.target.value }))}
+                        required
+                        className="cwb-form-input w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                        style={{
+                          '--tw-ring-color': config.themeColor,
+                          'focusRingColor': config.themeColor
+                        } as React.CSSProperties}
+                      />
+                    </div>
                   )}
 
                   <button
-                    type="submit"
-                    className="w-full py-2 text-white rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+                    className="cwb-start-chat-btn w-full py-2 text-white rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
                     style={{ backgroundColor: config.themeColor }}
                     onClick={handleStartChat}
                   >

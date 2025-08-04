@@ -50,47 +50,71 @@ const UserInfoForm = ({ config, onSubmit }: {
 
   return (
     <div className="p-4 space-y-4">
-      <div className="text-center mb-4">
-        <p className="text-sm text-gray-600">{config.userInfoMessage}</p>
+      <div
+        className="welcome-bubble bg-white p-3 rounded-lg shadow-sm text-sm flex items-center gap-2"
+        style={{ borderLeft: `3px solid ${config.themeColor}` }}
+      >
+        <span className="text-xl">👋</span>
+        <span style={{ color: config.themeColor }} className="font-medium">
+          Welcome!
+        </span>
       </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="form-message text-sm text-gray-600 mb-4">
+        {config.userInfoMessage}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
         {config.requiredFields.name && (
-          <Input
-            type="text"
-            placeholder="Your Name"
-            value={formData.name}
-            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            required
-            className="text-sm"
-          />
+          <div className="form-field">
+            <label className="field-label text-xs text-gray-600 mb-1 block">
+              Name *
+            </label>
+            <Input
+              type="text"
+              placeholder="Your name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              required
+              className="form-input text-sm"
+            />
+          </div>
         )}
-        
+
         {config.requiredFields.email && (
-          <Input
-            type="email"
-            placeholder="Your Email"
-            value={formData.email}
-            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-            required
-            className="text-sm"
-          />
+          <div className="form-field">
+            <label className="field-label text-xs text-gray-600 mb-1 block">
+              Email *
+            </label>
+            <Input
+              type="email"
+              placeholder="your@email.com"
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              required
+              className="form-input text-sm"
+            />
+          </div>
         )}
-        
+
         {config.requiredFields.phone && (
-          <Input
-            type="tel"
-            placeholder="Your Phone"
-            value={formData.phone}
-            onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-            required
-            className="text-sm"
-          />
+          <div className="form-field">
+            <label className="field-label text-xs text-gray-600 mb-1 block">
+              Phone *
+            </label>
+            <Input
+              type="tel"
+              placeholder="+1 (555) 123-4567"
+              value={formData.phone}
+              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+              required
+              className="form-input text-sm"
+            />
+          </div>
         )}
-        
-        <Button 
-          type="submit" 
-          className="w-full text-sm"
+
+        <Button
+          type="submit"
+          className="start-chat-btn w-full text-sm"
           style={{ backgroundColor: config.themeColor }}
         >
           Start Chat
