@@ -26,7 +26,7 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
     link.download = 'chat-widget-config.json';
     link.click();
     URL.revokeObjectURL(url);
-    
+
     toast({
       title: "Config Downloaded!",
       description: "Your widget configuration has been downloaded.",
@@ -65,7 +65,7 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
               Configuration Complete!
             </h2>
             <p className="cwb-completion-description text-cwb-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-              Your chat widget has been successfully configured with all your custom settings and preferences. 
+              Your chat widget has been successfully configured with all your custom settings and preferences.
               Your widget is now ready to be deployed on your website.
             </p>
           </div>
@@ -90,7 +90,7 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
                 <span className="cwb-summary-label font-medium text-cwb-muted-foreground">Theme:</span>
                 <span className="cwb-summary-value ml-2 text-cwb-foreground flex items-center gap-2">
                   {config.themeColor}
-                  <div 
+                  <div
                     className="w-4 h-4 rounded border border-cwb-border"
                     style={{ backgroundColor: config.themeColor }}
                   ></div>
@@ -135,7 +135,7 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
             </div>
 
             <div className="cwb-secondary-actions flex flex-col sm:flex-row gap-3 justify-center items-center">
-              <Button
+              {/* <Button
                 variant="secondary"
                 onClick={handleDownloadConfig}
                 className="cwb-download-btn w-full sm:w-auto"
@@ -143,11 +143,11 @@ export const CompletionStep = ({ config, onRestart }: CompletionStepProps) => {
               >
                 <Download className="w-4 h-4 mr-2" />
                 Download Config
-              </Button>
+              </Button> */}
 
               <Button
                 variant="secondary"
-                onClick={handleGetEmbedCode}
+                // onClick={handleGetEmbedCode}
                 className="cwb-embed-btn w-full sm:w-auto"
                 size="sm"
               >

@@ -171,48 +171,9 @@ export const Step2ThemeAppearance = ({
           <details className="cwb-collapsible px-0 py-0 mb-6" open>
             <summary className="flex items-center justify-between cursor-pointer select-none text-base font-semibold text-cwb-foreground">
               <span>Chat Prompt</span>
-              <span className="text-xs text-cwb-muted-foreground ml-2">Configure the message bubble above the chat icon</span>
             </summary>
             <div className="mt-4 space-y-4">
-              {/* Visual style selector */}
-              <div>
-                <Label className="text-xs font-medium text-cwb-muted-foreground mb-2 block">Prompt Style</Label>
-                <div className="flex flex-row gap-3">
-                  {[
-                    { value: 'bubble-above', label: 'Bubble Above', preview: (
-                      <div className="w-20 flex flex-col items-center">
-                        <div className="rounded-2xl bg-white border shadow px-3 py-1 text-xs text-cwb-foreground mb-1 max-w-[80px] text-center">Hi there!</div>
-                        <svg width="18" height="12" viewBox="0 0 18 12" fill="none" className="-mt-1">
-                          <polygon points="0,0 18,0 9,12" fill="#fff" stroke="#e5e7eb" />
-                        </svg>
-                      </div>
-                    ) },
-                    { value: 'inline', label: 'Inline', preview: (
-                      <div className="w-20 flex flex-row items-end gap-1">
-                        <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
-                          <circle cx="9" cy="6" r="6" fill="#fff" stroke="#e5e7eb" />
-                        </svg>
-                        <div className="rounded-2xl bg-white border shadow px-3 py-1 text-xs text-cwb-foreground max-w-[80px] text-center">Hi there!</div>
-                      </div>
-                    ) }
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={`flex flex-col items-center px-2 py-1 rounded-lg border transition-all shadow-sm ${
-                        (config.promptStyle || 'bubble-above') === option.value
-                          ? 'border-cwb-primary ring-2 ring-cwb-primary bg-white'
-                          : 'border-cwb-border bg-transparent'
-                      }`}
-                      onClick={() => onConfigChange({ promptStyle: option.value as any })}
-                      title={option.label}
-                    >
-                      {option.preview}
-                      <span className="text-xs mt-1">{option.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+
 
               {/* Prompt toggle and message */}
               <div className="flex items-center justify-between">
